@@ -19,6 +19,7 @@ media/
 # 如果你在项目目录下存放了 webhook 脚本的配置文件或日志
 hooks.json
 *.log
+*.sh
 
 # --- 编辑器 & 系统 ---
 .vscode/
