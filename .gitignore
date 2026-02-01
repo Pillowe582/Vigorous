@@ -1,0 +1,30 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# --- Django ---
+db.sqlite3
+db.sqlite3-journal
+# 静态文件收集目录（由 STATIC_ROOT 定义，服务器上自动生成，不应进入 Git）
+staticfiles/
+# 媒体文件目录（用户上传的内容）
+media/
+
+# --- 1Panel & 部署相关 ---
+# 如果你在项目目录下存放了 webhook 脚本的配置文件或日志
+hooks.json
+*.log
+
+# --- 编辑器 & 系统 ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 敏感信息 ---
+.env
