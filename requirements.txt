@@ -1,13 +1,6 @@
 # requirements.txt
-Django
-djangorestframework
-gunicorn
-three-py
-numpy
-open3d
-python-decouple  # 环境变量管理
-
-# 开发工具
-pylint-django
-black  # 代码格式化
-pre-commit  # Git钩子
+Django==4.2.0
+djangorestframework==3.14.0
+gunicorn==20.1.0
+numpy==1.24.0
+python-decouple==3.8
