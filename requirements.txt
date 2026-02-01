@@ -1,0 +1,13 @@
+# requirements.txt
+Django
+djangorestframework
+gunicorn
+three-py
+numpy
+open3d
+python-decouple  # 环境变量管理
+
+# 开发工具
+pylint-django
+black  # 代码格式化
+pre-commit  # Git钩子
