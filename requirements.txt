@@ -4,3 +4,4 @@ djangorestframework
 gunicorn
 numpy
 python-decouple
+pillow

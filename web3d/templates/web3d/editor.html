@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D模型编辑器</title>
+</head>
+<body>
+    <h1>轻量化3D模型生成器</h1>
+    <div>
+        <label for="thickness">厚度：</label>
+        <input type="range" id="thickness" name="thickness" min="1" max="10" value="3">
+        <span id="thicknessValue">3</span>
+    </div>
+    <button onclick="generateModel()">生成模型</button>
+    <div id="responseMessage"></div>
+
+    <script>
+        // 更新滑块值的显示
+        document.getElementById('thickness').oninput = function() {
+            document.getElementById('thicknessValue').textContent = this.value;
+        };
+
+        function generateModel() {
+            // 1. 收集前端参数
+            const params = {
+                thickness: document.getElementById('thickness').value,
+                // 后续可以添加更多参数...
+            };
+
+            // 2. 发送POST请求到后端API
+            fetch('/api/generator', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',  // Django用于防护的安全令牌
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => response.json())  // 将响应解析为JSON
+            .then(data => {
+                // 3. 处理后端返回的数据
+                console.log(data);
+                document.getElementById('responseMessage').innerHTML = `<p>状态：${data.status}</p><p>消息：${data.message}</p>`;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
