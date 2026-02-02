@@ -5,5 +5,5 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
     path('editor/', views.editor, name='editor'),
-    path('api/generator', views.generator_api, name='generator_api'),
+    path('editor/api/generator', views.generator_api, name='generator_api'),
 ]
