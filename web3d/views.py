@@ -40,3 +40,6 @@ def generator_api(request):
     else:
         # 如果不是POST请求，返回错误
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
+
+def model(request):
+    return render(request, 'web3d/model.html')
