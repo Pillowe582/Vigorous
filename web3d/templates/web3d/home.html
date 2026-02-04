@@ -10,8 +10,26 @@
 <body>
     <header class="header">
         <div class="logo">🎨 3D模型生成器</div>
-        <div class="auth-buttons">
-            <button class="btn btn-login" onclick="window.location.href='#'">登录</button>
+        <div class="auth-container">
+            {% if user.is_authenticated %}
+                <!-- 已登录用户显示头像和下拉菜单 -->
+                <div class="user-dropdown">
+                    <div class="user-info" id="userDropdown">
+                        <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+                        <span class="username">{{ user.username }}</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="{% url 'accounts:profile' %}" class="dropdown-item">用户管理</a>
+                        <a href="#" class="dropdown-item warn-item" onclick="confirmLogout()">退出登录</a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- 未登录用户显示登录按钮 -->
+                <div class="auth-buttons">
+                    <button class="btn btn-login" onclick="window.location.href='{% url 'accounts:login' %}'">登录</button>
+                </div>
+            {% endif %}
         </div>
     </header>
 
@@ -20,7 +38,7 @@
             <h1>欢迎，{{ username }}！</h1>
             <p class="subtitle">在这里创造属于你的独特3D世界，从简单的几何体开始，打造复杂的数字艺术品</p>
             
-            <a href="{% url 'editor' %}" class="editor-button">
+            <a href="{% url 'web3d:editor' %}" class="editor-button">
                 🎨 进入3D模型编辑器
             </a>
             
@@ -48,8 +66,89 @@
         </div>
     </div>
 
+    <!-- 退出登录确认弹框 -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>确认退出</h3>
+            </div>
+            <div class="modal-body">
+                <p>您确定要退出登录吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn btn-confirm" onclick="performLogout()">确认</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>&copy; 2024 3D模型生成器 | 让创意变为现实</p>
+        <p>&copy; 2026 3D模型生成器 | 让创意变为现实</p>
     </footer>
+
+    <script>
+        // 下拉菜单功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const userDropdown = document.getElementById('userDropdown');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+            
+            // 点击其他地方关闭下拉菜单
+            document.addEventListener('click', function() {
+                dropdownMenu.classList.remove('show');
+            });
+        });
+        
+        // 退出登录确认功能
+        function confirmLogout() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        
+        function performLogout() {
+            // 发送POST请求到登出URL
+            fetch('{% url "accounts:logout" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('登出错误:', error);
+                window.location.href = '{% url "accounts:logout" %}';
+            });
+        }
+        
+        // 获取CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
 </body>
 </html>

@@ -5,7 +5,9 @@ import json
 # Create your views here.
 def home(request):
     """项目首页的视图函数"""
-    context = {'username': '开发者?'}  # 这就是要传递给模板的动态数据
+    # 传递当前登录用户的用户名，如果没有登录则传递默认值
+    username = request.user.username if request.user.is_authenticated else '访客'
+    context = {'username': username, 'user': request.user}  # 传递完整的用户对象
     return render(request, 'web3d/home.html', context)  # 渲染模板
 
 def about(request):

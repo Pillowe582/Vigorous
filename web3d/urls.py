@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views  # 从当前目录导入views模块
 
+app_name = 'web3d'
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
