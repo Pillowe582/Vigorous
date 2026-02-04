@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 3D模型生成器</title>
+    <link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}">
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1>用户管理</h1>
+            <a href="{% url 'web3d:home' %}" class="back-link">← 返回首页</a>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="profile-content">
+            <div class="profile-card">
+                <div class="avatar-section">
+                    <div class="current-avatar">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="头像" class="avatar-img">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ user.username|slice:":1"|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <h3>{{ user.username }}</h3>
+                    <p class="user-info">当前用户名：{{ user.username }}</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="new_username">新用户名:</label>
+                        <input type="text" id="new_username" name="new_username" value="{{ user.username }}" maxlength="150">
+                        <small class="help-text">用户名只能包含字母、数字和@/./+/-/_字符，不能包含空格，长度不超过150个字符</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avatar">头像:</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="avatar" name="avatar" accept="image/*" class="file-input">
+                            <label for="avatar" class="file-upload-btn">
+                                <span class="upload-icon">📁</span>
+                                <span class="upload-text">选择图片文件</span>
+                                <span class="file-name">未选择文件</span>
+                            </label>
+                        </div>
+                        <small class="help-text">支持 JPG、PNG 格式，建议尺寸 200x200 像素</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password">新密码:</label>
+                        <input type="password" id="new_password" name="new_password" placeholder="留空则不修改密码">
+                        <small class="help-text">密码需满足安全性要求（至少8位，不能与用户名相似等）</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">确认新密码:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="再次输入新密码">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">保存更改</button>
+                        <a href="{% url 'web3d:home' %}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 文件上传按钮交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('avatar');
+            const fileUploadBtn = document.querySelector('.file-upload-btn');
+            const fileNameSpan = document.querySelector('.file-name');
+            
+            if (fileInput && fileUploadBtn && fileNameSpan) {
+                fileInput.addEventListener('change', function(e) {
+                    const fileName = e.target.files[0] ? e.target.files[0].name : '未选择文件';
+                    fileNameSpan.textContent = fileName;
+                    
+                    // 更新按钮样式类
+                    if (e.target.files[0]) {
+                        fileUploadBtn.classList.add('file-selected');
+                        fileUploadBtn.querySelector('.upload-icon').textContent = '✅';
+                        fileUploadBtn.querySelector('.upload-text').textContent = '文件已选择';
+                    } else {
+                        fileUploadBtn.classList.remove('file-selected');
+                        fileUploadBtn.querySelector('.upload-icon').textContent = '📁';
+                        fileUploadBtn.querySelector('.upload-text').textContent = '选择图片文件';
+                    }
+                });
+                
+                // 拖拽上传支持
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    fileUploadBtn.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    fileUploadBtn.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    fileUploadBtn.addEventListener(eventName, unhighlight, false);
+                });
+                
+                function highlight() {
+                    fileUploadBtn.classList.add('drag-over');
+                }
+                
+                function unhighlight() {
+                    fileUploadBtn.classList.remove('drag-over');
+                }
+                
+                fileUploadBtn.addEventListener('drop', function(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    
+                    if (files.length) {
+                        fileInput.files = files;
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

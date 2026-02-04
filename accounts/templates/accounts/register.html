@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 3D模型生成器</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'accounts/css/register.css' %}">
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <h1>📝 注册</h1>
+            <p>创建您的3D创作账户</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="error-messages">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">用户名</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error-field">
+                        {% for error in form.username.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="password-requirements">
+                    4-150个字符，只能包含字母、数字和@/./+/-/_字符
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">密码</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="error-field">
+                        {% for error in form.password1.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="password-strength">
+                    <div class="strength-meter" id="strengthMeter"></div>
+                </div>
+                <div class="password-requirements">
+                    至少8个字符，不能过于简单
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">确认密码</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="error-field">
+                        {% for error in form.password2.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn">创建账户</button>
+        </form>
+
+        <div class="divider">
+            <span>已有账户？</span>
+        </div>
+
+        <div class="links">
+            <p><a href="{% url 'accounts:login' %}">立即登录</a></p>
+            <p style="margin-top: 10px;"><a href="{% url 'web3d:home' %}">返回首页</a></p>
+        </div>
+    </div>
+
+    <script>
+        // 密码强度检测
+        document.getElementById('{{ form.password1.id_for_label }}').addEventListener('input', function() {
+            const password = this.value;
+            const strengthMeter = document.getElementById('strengthMeter');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            strengthMeter.className = 'strength-meter';
+            if (strength <= 1) {
+                strengthMeter.classList.add('strength-weak');
+            } else if (strength <= 3) {
+                strengthMeter.classList.add('strength-medium');
+            } else {
+                strengthMeter.classList.add('strength-strong');
+            }
+        });
+
+        // 密码确认验证
+        document.getElementById('{{ form.password2.id_for_label }}').addEventListener('input', function() {
+            const password1 = document.getElementById('{{ form.password1.id_for_label }}').value;
+            const password2 = this.value;
+            
+            if (password1 !== password2 && password2 !== '') {
+                this.setCustomValidity('两次输入的密码不匹配');
+                this.style.borderColor = '#e53e3e';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#e2e8f0';
+            }
+        });
+        
+        // 自动聚焦到第一个错误字段
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstErrorField = document.querySelector('.error-field input');
+            if (firstErrorField) {
+                firstErrorField.focus();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$zqowla76r@i4hm)d%+s=)5sanshx*%0_w#4%z)-e3wp(*(1qd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['8.141.101.177','127.0.0.1']
-
+ALLOWED_HOSTS = ['8.141.101.177','localhost','127.0.0.1']
+TRUSTED_PROXIES = ['127.0.0.1', '172.17.0.1']
 
 # Application definition
 
@@ -114,6 +114,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.views.CaseInsensitiveAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -123,6 +129,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (用户上传的文件)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # WhiteNoise 配置，用于生产环境静态文件服务
 WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
