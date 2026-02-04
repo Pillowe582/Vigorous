@@ -2,19 +2,54 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>3D模型生成器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D模型生成器 - 首页</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'homepage/css/style.css' %}">
 </head>
 <body>
-    <h1>欢迎，{{ username }}！</h1>
-    <div style="text-align: left; margin-top: 30px;">
-        <a href="{% url 'editor' %}" class="editor-button">
-            🎨 进入3D模型编辑器
-        </a>
+    <header class="header">
+        <div class="logo">🎨 3D模型生成器</div>
+        <div class="auth-buttons">
+            <button class="btn btn-login" onclick="window.location.href='#'">登录</button>
         </div>
-    <p>这里是我们的3D模型生成器雏形。</p>
-        
+    </header>
+
+    <div class="container">
+        <section class="welcome-section">
+            <h1>欢迎，{{ username }}！</h1>
+            <p class="subtitle">在这里创造属于你的独特3D世界，从简单的几何体开始，打造复杂的数字艺术品</p>
+            
+            <a href="{% url 'editor' %}" class="editor-button">
+                🎨 进入3D模型编辑器
+            </a>
+            
+            <p style="margin-top: 30px; color: #718096;">这里是我们的3D模型生成器雏形，更多功能正在开发中...</p>
+        </section>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📐</div>
+                <h3 class="feature-title">参数化建模</h3>
+                <p class="feature-desc">通过调整参数快速生成各种基础几何形状，无需复杂的专业知识</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">实时预览</h3>
+                <p class="feature-desc">所见即所得的编辑体验，在线实时渲染您的3D创作</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📤</div>
+                <h3 class="feature-title">导出分享</h3>
+                <p class="feature-desc">支持多种格式导出，轻松分享您的3D作品给朋友</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 3D模型生成器 | 让创意变为现实</p>
+    </footer>
 </body>
-
-
-
 </html>
