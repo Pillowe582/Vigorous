@@ -18,8 +18,14 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        # 使用 get_or_create 更加安全，防止重复创建报错
+        Profile.objects.get_or_create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    # 先检查是否有 profile 属性，避免 RelatedObjectDoesNotExist 错误
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+    else:
+        # 如果保存时发现漏了 Profile（比如你刚才遇到的情况），自动补齐
+        Profile.objects.get_or_create(user=instance)
