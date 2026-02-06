@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
+from .models import DesignProject
 import json
 
 # Create your views here.
@@ -7,7 +8,17 @@ def home(request):
     """项目首页的视图函数"""
     # 传递当前登录用户的用户名，如果没有登录则传递默认值
     username = request.user.username if request.user.is_authenticated else '访客'
-    context = {'username': username, 'user': request.user}  # 传递完整的用户对象
+    
+    # 获取当前用户的项目列表（仅在用户已登录时）
+    user_projects = None
+    if request.user.is_authenticated:
+        user_projects = DesignProject.objects.filter(user=request.user).order_by('-created_at')[:10]  # 获取最近的10个项目
+    
+    context = {
+        'username': username, 
+        'user': request.user,  # 传递完整的用户对象
+        'user_projects': user_projects  # 传递用户的项目列表
+    }
     return render(request, 'web3d/home.html', context)  # 渲染模板
 
 def about(request):
