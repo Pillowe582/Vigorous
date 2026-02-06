@@ -8,6 +8,5 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('editor/', views.editor, name='editor'),
     path('editor/api/generator', views.generator_api, name='generator_api'),
-    path('model/', views.model, name='model'),
-    path('react_app/', views.react_app, name='react_app'),
+
 ]

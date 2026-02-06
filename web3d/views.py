@@ -42,10 +42,3 @@ def generator_api(request):
     else:
         # 如果不是POST请求，返回错误
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'})
-
-def model(request):
-    return render(request, 'web3d/model.html')
-
-def react_app(request):
-    """React Three Fiber应用的视图函数"""
-    return render(request, 'web3d/react_app.html')
