@@ -45,6 +45,35 @@
             <p style="margin-top: 30px; color: #718096;">这里是我们的3D模型生成器雏形，更多功能正在开发中...</p>
         </section>
 
+        {% if user.is_authenticated %}
+        <!-- 已登录用户显示项目列表 -->
+        <section class="projects-section">
+            <h2>我的项目</h2>
+            {% if user_projects %}
+            <div class="projects-grid">
+                {% for project in user_projects %}
+                <div class="project-card">
+                    <div class="project-icon">📦</div>
+                    <h3 class="project-title">{{ project.name }}</h3>
+                    <p class="project-meta">创建于 {{ project.created_at|date:"Y-m-d H:i" }}</p>
+                    <div class="project-status">
+                        <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-small" onclick="loadProject({{ project.id }})">编辑</button>
+                        <button class="btn btn-small btn-secondary" onclick="downloadProject({{ project.id }})">下载</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-projects">
+                <p>您还没有任何项目。您可以 <a href="{% url 'web3d:editor' %}">创建第一个项目</a>。</p>
+            </div>
+            {% endif %}
+        </section>
+        {% else %}
+        <!-- 未登录用户显示功能介绍 -->
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">📐</div>
@@ -64,6 +93,7 @@
                 <p class="feature-desc">支持多种格式导出，轻松分享您的3D作品给朋友</p>
             </div>
         </div>
+        {% endif %}
     </div>
 
     <!-- 退出登录确认弹框 -->
@@ -148,6 +178,17 @@
                 }
             }
             return cookieValue;
+        }
+        
+        // 项目操作函数
+        function loadProject(projectId) {
+            // TODO: 实现加载项目到编辑器的逻辑
+            alert("加载项目ID: " + projectId);
+        }
+        
+        function downloadProject(projectId) {
+            // TODO: 实现下载项目的逻辑
+            alert("下载项目ID: " + projectId);
         }
     </script>
 </body>
