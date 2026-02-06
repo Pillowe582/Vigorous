@@ -27,7 +27,7 @@
             {% else %}
                 <!-- 未登录用户显示登录按钮 -->
                 <div class="auth-buttons">
-                    <button class="btn btn-login" onclick="window.location.href='{% url 'accounts:login' %}'">登录</button>
+                    <button class="btn btn-login" onclick="window.location.href='{% url "accounts:login" %}'">登录</button>
                 </div>
             {% endif %}
         </div>
@@ -39,13 +39,9 @@
             <p class="subtitle">在这里创造属于你的独特3D世界，从简单的几何体开始，打造复杂的数字艺术品</p>
             
             <a href="{% url 'web3d:editor' %}" class="editor-button">
-                🎨 进入3D模型编辑器
+                🎨 进入3D模型编辑器（NEW）
             </a>
         <br>
-        <a href="{% url 'web3d:react_app' %}" class="react-app-button">
-            🔗 进入React Three Fiber应用
-        </a>
-            
             <p style="margin-top: 30px; color: #718096;">这里是我们的3D模型生成器雏形，更多功能正在开发中...</p>
         </section>
 
