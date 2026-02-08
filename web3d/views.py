@@ -26,13 +26,8 @@ def about(request):
     return HttpResponse('<h1>关于我们?</h1>')
 
 def editor(request):
-    '''渲染静态文件目录下的index.html文件。似乎无法直接使用render()函数，因为index.html文件在静态文件目录下，
-    而render()函数默认从模板目录下渲染文件。AI推荐使用django.views.static.serve()函数来渲染静态文件。'''
-    from django.views.static import serve
-    import os
-    from django.conf import settings
-    file_path = os.path.join(settings.STATICFILES_DIRS[0], 'index.html')
-    return serve(request, os.path.basename(file_path), os.path.dirname(file_path))
+    '''渲染编辑器页面'''
+    return render(request, 'web3d/editor.html')
     
 '''先前代码，先注释掉
 def generator_api(request):
