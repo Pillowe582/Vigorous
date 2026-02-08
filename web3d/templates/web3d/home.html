@@ -182,8 +182,8 @@
         
         // 项目操作函数
         function loadProject(projectId) {
-            // TODO: 实现加载项目到编辑器的逻辑
-            alert("加载项目ID: " + projectId);
+            // 重定向到编辑器页面并传递项目ID
+            window.location.href = '{% url "web3d:editor" %}?project_id=' + projectId;
         }
         
         function downloadProject(projectId) {

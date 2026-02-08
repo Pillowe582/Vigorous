@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse,JsonResponse
 from .models import DesignProject
 import json
+from datetime import datetime
 
 # Create your views here.
 def home(request):
@@ -26,9 +27,38 @@ def about(request):
     return HttpResponse('<h1>关于我们?</h1>')
 
 def editor(request):
-    '''渲染编辑器页面'''
-    return render(request, 'web3d/editor.html')
+    '''渲染编辑器页面，支持传入项目ID'''
+    # 获取项目ID参数
+    project_id = request.GET.get('project_id')
+    project_data = None
     
+    if project_id:
+        try:
+            # 获取项目对象
+            project = get_object_or_404(DesignProject, id=project_id)
+            # 确保项目属于当前用户（如果是已登录用户）
+            if request.user.is_authenticated and project.user != request.user:
+                project = None
+            else:
+                # 准备项目数据供前端使用
+                project_data = {
+                    'id': project.id,
+                    'name': project.name,
+                    'description': project.description,
+                    'parameters': project.parameters,
+                    'status': project.status,
+                    'created_at': project.created_at.isoformat() if project.created_at else None,
+                }
+        except:
+            project_data = None
+    
+    context = {
+        'project_data': json.dumps(project_data) if project_data else 'null'
+    }
+    return render(request, 'web3d/editor.html', context)
+
+
+
 '''先前代码，先注释掉
 def generator_api(request):
     """API接口：接收前端发送的参数，返回处理结果（暂为模拟）"""
