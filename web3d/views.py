@@ -119,13 +119,52 @@ def save_project(request):
                 'project_id': project.id,
                 'created_at': project.created_at.isoformat()
             }
-        
+            
         return JsonResponse(response_data)
         
     except json.JSONDecodeError:
         return JsonResponse({'error': '无效的JSON数据'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'保存失败: {str(e)}'}, status=500)
+
+
+@csrf_exempt
+@login_required
+def delete_project(request):
+    '''删除项目API'''
+    if request.method != 'POST':
+        return JsonResponse({'error': '只支持POST请求'}, status=405)
+    
+    try:
+        # 解析POST数据
+        data = json.loads(request.body.decode('utf-8'))
+        project_id = data.get('projectId')
+        
+        # 验证必要字段
+        if not project_id:
+            return JsonResponse({'error': '项目ID不能为空'}, status=400)
+        
+        user = request.user
+        
+        # 查找并删除项目
+        try:
+            project = DesignProject.objects.get(id=project_id, user=user)
+            project_name = project.name
+            project.delete()
+            
+            response_data = {
+                'success': True,
+                'message': f'项目"{project_name}"删除成功'
+            }
+        except DesignProject.DoesNotExist:
+            return JsonResponse({'error': '项目不存在或无权限访问'}, status=404)
+            
+        return JsonResponse(response_data)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': '无效的JSON数据'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'删除失败: {str(e)}'}, status=500)
 
 '''先前代码，先注释掉
 def generator_api(request):

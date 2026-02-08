@@ -28,6 +28,7 @@
             </div>
             
             <button type="submit" id="saveProjectBtn" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">保存项目信息</button>
+            <button type="button" id="deleteProjectBtn" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; display: none;">删除项目</button>
             <div id="successMessage" style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-top: 10px; display: none;">项目信息保存成功！</div>
             <div id="errorMessage" style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-top: 10px; display: none;"></div>
         </form>
@@ -64,8 +65,18 @@
             // 表单提交处理
             const form = document.getElementById('projectEditorForm');
             const saveBtn = document.getElementById('saveProjectBtn');
+            const deleteBtn = document.getElementById('deleteProjectBtn');
             const successMsg = document.getElementById('successMessage');
             const errorMsg = document.getElementById('errorMessage');
+            
+            // 根据项目状态设置按钮文本和显示删除按钮
+            if (projectData && projectData.id) {
+                saveBtn.textContent = '保存项目更改';
+                deleteBtn.style.display = 'inline-block'; // 显示删除按钮
+            } else {
+                saveBtn.textContent = '创建新项目';
+                deleteBtn.style.display = 'none'; // 隐藏删除按钮
+            }
             
             // 隐藏消息函数
             function hideMessages() {
@@ -148,9 +159,64 @@
                 .finally(() => {
                     // 恢复按钮状态
                     saveBtn.disabled = false;
-                    saveBtn.textContent = '保存项目信息';
+                    // 根据项目状态设置按钮文本
+                    if (projectData && projectData.id) {
+                        saveBtn.textContent = '保存项目更改';
+                    } else {
+                        saveBtn.textContent = '创建新项目';
+                    }
                     saveBtn.style.backgroundColor = '#28a745';
                 });
+            });
+            
+            // 删除项目按钮事件处理
+            deleteBtn.addEventListener('click', function() {
+                // 二次确认
+                const projectName = projectNameInput.value.trim() || '未命名项目';
+                const confirmMessage = `确定要删除项目 "${projectName}" 吗？此操作不可撤销！`;
+                
+                if (confirm(confirmMessage)) {
+                    // 用户确认删除
+                    hideMessages();
+                    deleteBtn.disabled = true;
+                    deleteBtn.textContent = '删除中...';
+                    deleteBtn.style.backgroundColor = '#6c757d';
+                    
+                    // 发送删除请求
+                    fetch('{% url "web3d:delete_project" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                                         document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]
+                        },
+                        body: JSON.stringify({
+                            projectId: projectData.id
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccess('项目删除成功！');
+                            // 延迟跳转到主页
+                            setTimeout(() => {
+                                window.location.href = '{% url "web3d:home" %}';
+                            }, 1500);
+                        } else {
+                            showError(data.error || '删除失败');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ 删除请求失败:', error);
+                        showError('网络错误，请稍后重试');
+                    })
+                    .finally(() => {
+                        // 恢复按钮状态
+                        deleteBtn.disabled = false;
+                        deleteBtn.textContent = '删除项目';
+                        deleteBtn.style.backgroundColor = '#dc3545';
+                    });
+                }
             });
             
             // 实时更新页面标题
@@ -170,6 +236,7 @@
         });
     </script>
     
+    <!-- 这里是原来的react脚本 -->
     <script src="{% static 'web3d/js/index-B9h7PBBC.js' %}"></script>
 </body>
 </html>
