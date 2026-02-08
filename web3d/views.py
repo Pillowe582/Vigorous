@@ -15,7 +15,7 @@ def home(request):
     # 获取当前用户的项目列表（仅在用户已登录时）
     user_projects = None
     if request.user.is_authenticated:
-        user_projects = DesignProject.objects.filter(user=request.user).order_by('-created_at')[:10]  # 获取最近的10个项目
+        user_projects = DesignProject.objects.filter(user=request.user).order_by('-edited_at')[:10]  # 获取最近的10个项目
     
     context = {
         'username': username, 
