@@ -56,6 +56,7 @@
                     <div class="project-icon">📦</div>
                     <h3 class="project-title">{{ project.name }}</h3>
                     <p class="project-meta">创建于 {{ project.created_at|date:"Y-m-d H:i" }}</p>
+                    <p class="project-meta">修改于 {{ project.edited_at|date:"Y-m-d H:i" }}</p>
                     <div class="project-status">
                         <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
                     </div>
@@ -182,8 +183,8 @@
         
         // 项目操作函数
         function loadProject(projectId) {
-            // TODO: 实现加载项目到编辑器的逻辑
-            alert("加载项目ID: " + projectId);
+            // 重定向到编辑器页面并传递项目ID
+            window.location.href = '{% url "web3d:editor" %}?project_id=' + projectId;
         }
         
         function downloadProject(projectId) {

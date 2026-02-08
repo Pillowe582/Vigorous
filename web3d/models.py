@@ -10,6 +10,7 @@ class DesignProject(models.Model):
     name = models.CharField(max_length=200, verbose_name="项目名称")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="创建者")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    edited_at = models.DateTimeField(auto_now=True, verbose_name="修改时间")
     parameters = models.JSONField(default=dict, verbose_name="模型参数")
     stl_file = models.FileField(upload_to='generated_models/', blank=True, verbose_name="模型文件")
     preview_image = models.ImageField(upload_to='previews/', blank=True, verbose_name="预览图")

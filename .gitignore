@@ -14,7 +14,9 @@ db.sqlite3-journal
 staticfiles/
 # 媒体文件目录（用户上传的内容）
 media/
-
+# 迁移文件目录
+web3d/migrations/
+accounts/migrations/
 # --- 1Panel & 部署相关 ---
 # 如果你在项目目录下存放了 webhook 脚本的配置文件或日志
 hooks.json
