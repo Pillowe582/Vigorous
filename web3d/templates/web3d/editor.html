@@ -1,15 +1,175 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="{% static 'web3d/images/vite.svg' %}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vigorous 3D Editor</title>
-    <script type="module" crossorigin src="{% static 'web3d/js/index-B9h7PBBC.js' %}"></script>
-    <link rel="stylesheet" crossorigin href="{% static 'web3d/css/index-CYx8u_nq.css' %}">
-  </head>
-  <body>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>{% if project_data and project_data != 'null' %}{{ project_data.name }} - {% endif %}3D模型编辑器</title>
+    <link rel="stylesheet" href="{% static 'web3d/css/index-CYx8u_nq.css' %}">
+</head>
+<body>
+    <!-- 项目信息编辑区域 -->
+    <div style="padding: 20px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 20px;">
+        <h2>项目信息</h2>
+        <form id="projectEditorForm">
+            <div style="margin-bottom: 15px;">
+                <label for="projectName" style="display: block; margin-bottom: 5px; font-weight: bold;">项目名称：</label>
+                <input type="text" id="projectName" name="projectName" 
+                       value="{% if project_data and project_data != 'null' %}{{ project_data.name }}{% else %}新建项目{% endif %}" 
+                       placeholder="请输入项目名称"
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="projectDescription" style="display: block; margin-bottom: 5px; font-weight: bold;">项目描述：</label>
+                <textarea id="projectDescription" name="projectDescription" 
+                          placeholder="请输入项目描述"
+                          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; min-height: 80px; resize: vertical;">{% if project_data and project_data != 'null' %}{{ project_data.description }}{% endif %}</textarea>
+            </div>
+            
+            <button type="submit" id="saveProjectBtn" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">保存项目信息</button>
+            <div id="successMessage" style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-top: 10px; display: none;">项目信息保存成功！</div>
+            <div id="errorMessage" style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-top: 10px; display: none;"></div>
+        </form>
+    </div>
+    
     <div id="root"></div>
-  </body>
+    
+    <!-- 添加项目信息处理的JavaScript -->
+    <script>
+        // 处理传入的项目信息
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从Django模板获取项目数据
+            const projectDataJson = '{{ project_data|escapejs }}';
+            let projectData = null;
+            
+            if (projectDataJson && projectDataJson !== 'null') {
+                try {
+                    projectData = JSON.parse(projectDataJson);
+                } catch (e) {
+                    console.error('❌ 解析项目数据失败:', e);
+                }
+            }
+            
+            // 设置表单初始值
+            const projectNameInput = document.getElementById('projectName');
+            const projectDescInput = document.getElementById('projectDescription');
+            
+            if (projectData) {
+                projectNameInput.value = projectData.name || '';
+                projectDescInput.value = projectData.description || '';
+                console.log('🎨 已加载项目信息:', projectData);
+            }
+            
+            // 表单提交处理
+            const form = document.getElementById('projectEditorForm');
+            const saveBtn = document.getElementById('saveProjectBtn');
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            // 隐藏消息函数
+            function hideMessages() {
+                successMsg.style.display = 'none';
+                errorMsg.style.display = 'none';
+            }
+            
+            // 显示成功消息
+            function showSuccess(message) {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+                setTimeout(() => hideMessages(), 3000);
+            }
+            
+            // 显示错误消息
+            function showError(message) {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+                setTimeout(() => hideMessages(), 5000);
+            }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                hideMessages();
+                
+                // 获取表单数据
+                const formData = {
+                    name: projectNameInput.value.trim(),
+                    description: projectDescInput.value.trim(),
+                    projectId: projectData ? projectData.id : null,
+                    parameters: {} // 这里可以添加实际的3D模型参数
+                };
+                
+                // 简单验证
+                if (!formData.name) {
+                    showError('请输入项目名称');
+                    return;
+                }
+                
+                // 更新保存按钮状态
+                saveBtn.disabled = true;
+                saveBtn.textContent = '保存中...';
+                saveBtn.style.backgroundColor = '#6c757d';
+                
+                // 发送AJAX请求保存到数据库
+                fetch('{% url "web3d:save_project" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                                     document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 更新页面标题
+                        document.title = formData.name + ' - 3D模型编辑器';
+                        
+                        // 如果是新项目，更新projectData
+                        if (!projectData && data.project_id) {
+                            projectData = {
+                                id: data.project_id,
+                                name: formData.name,
+                                description: formData.description
+                            };
+                        }
+                        
+                        showSuccess(data.message);
+                        console.log('✅ 项目信息已保存到数据库:', data);
+                    } else {
+                        showError(data.error || '保存失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ 保存请求失败:', error);
+                    showError('网络错误，请稍后重试');
+                })
+                .finally(() => {
+                    // 恢复按钮状态
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '保存项目信息';
+                    saveBtn.style.backgroundColor = '#28a745';
+                });
+            });
+            
+            // 实时更新页面标题
+            projectNameInput.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    document.title = this.value.trim() + ' - 3D模型编辑器';
+                }
+            });
+            
+            if (projectData) {
+                // 也可以将项目信息存储到全局变量中供其他脚本使用
+                window.currentProject = projectData;
+                console.log('✅ 项目信息已成功加载到编辑器');
+            } else {
+                console.log('ℹ️ 未检测到传入的项目信息，将以新项目模式启动');
+            }
+        });
+    </script>
+    
+    <script src="{% static 'web3d/js/index-B9h7PBBC.js' %}"></script>
+</body>
 </html>
