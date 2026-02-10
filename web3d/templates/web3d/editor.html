@@ -63,6 +63,9 @@
     <script>
         // 处理传入的项目信息
         document.addEventListener('DOMContentLoaded', function() {
+            // 初始化脏标记变量
+            let isDirty = false;
+            
             // 从Django模板获取项目数据
             const projectDataJson = '{{ project_data|escapejs }}';
             let projectData = null;
