@@ -6,6 +6,7 @@ __pycache__/
 venv/
 ENV/
 env/
+react/
 
 # --- Django ---
 db.sqlite3
