@@ -167,6 +167,7 @@ def delete_project(request):
         return JsonResponse({'error': f'删除失败: {str(e)}'}, status=500)
 
 @csrf_exempt
+@login_required
 def generator_api(request):
     """API接口：接收前端发送的参数，返回处理结果（暂为模拟）"""
     if request.method == "POST":
