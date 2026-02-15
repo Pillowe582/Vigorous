@@ -6,6 +6,9 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
 
+def get_default_feature():
+    return {"shape": "square", "size": 10}
+
 class BasicInfoModel(models.Model):
     '''这里是每个数据库都要继承的基本模型'''
     created_at = models.DateTimeField(auto_now_add=True,verbose_name="创建时间")
@@ -19,7 +22,7 @@ class BasicInfoModel(models.Model):
 class ProjectModel(BasicInfoModel):
     """项目模型：包含多个棋子的一个大项目"""
     description = models.TextField(blank=True, verbose_name="项目描述") 
-    feature = models.JSONField(default=lambda:{"shape":"square","size":10}, verbose_name="基本单位形状")
+    feature = models.JSONField(default=get_default_feature, verbose_name="基本单位形状")
     project_tags = models.JSONField(default=list, blank=True, verbose_name="标签集合")
     status = models.CharField(
         max_length=20,
@@ -47,7 +50,7 @@ class PieceAbstract(BasicInfoModel):
     description=models.TextField(blank=True, verbose_name="棋子描述")
     parts=models.JSONField(default=dict, verbose_name="棋子设计格式")  
     type=models.CharField(max_length=20, choices=[('default', '普通')], default='default', verbose_name="棋子类型")
-    feature=models.JSONField(default=lambda:{"shape":"square","size":10}, verbose_name="此棋子形状")
+    feature=models.JSONField(default=get_default_feature, verbose_name="此棋子形状")
     piece_tags=models.JSONField(default=list, blank=True, verbose_name="棋子标签")
     
     class Meta:
