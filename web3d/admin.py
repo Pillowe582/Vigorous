@@ -1,14 +1,14 @@
 # generator/admin.py
 
 from django.contrib import admin
-from .models import DesignProject
+from .models import ProjectModel
 
 admin.site.site_header = "3D模型生成器管理后台"
 admin.site.site_title = "3D生成器管理"
 admin.site.index_title = "欢迎使用3D模型生成器管理系统"
 
 # 方式2：使用装饰器注册（推荐，更灵活）
-@admin.register(DesignProject)
+@admin.register(ProjectModel)
 class DesignProjectAdmin(admin.ModelAdmin):
     # 在列表页显示的字段
     list_display = ('name', 'user', 'created_at', 'status')

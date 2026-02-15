@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
-from .models import DesignProject
+from .models import ProjectModel
 from django.utils import timezone
 
 # Create your views here.
@@ -15,7 +15,7 @@ def home(request):
     # 获取当前用户的项目列表（仅在用户已登录时）
     user_projects = None
     if request.user.is_authenticated:
-        user_projects = DesignProject.objects.filter(user=request.user).order_by('-edited_at')[:10]  # 获取最近的10个项目
+        user_projects = ProjectModel.objects.filter(user=request.user).order_by('-edited_at')[:10]  # 获取最近的10个项目
     
     context = {
         'username': username, 
@@ -37,7 +37,7 @@ def editor(request):
     if project_id:
         try:
             # 获取项目对象
-            project = get_object_or_404(DesignProject, id=project_id)
+            project = get_object_or_404(ProjectModel, id=project_id)
             # 确保项目属于当前用户（如果是已登录用户）
             if request.user.is_authenticated and project.user != request.user:
                 project = None
@@ -88,7 +88,7 @@ def save_project(request):
         if project_id:
             # 更新现有项目
             try:
-                project = DesignProject.objects.get(id=project_id, user=user)
+                project = ProjectModel.objects.get(id=project_id, user=user)
                 project.name = name
                 project.description = description
                 project.parameters = parameters
@@ -101,11 +101,11 @@ def save_project(request):
                     'project_id': project.id,
                     'updated_at': project.edited_at.isoformat()
                 }
-            except DesignProject.DoesNotExist:
+            except ProjectModel.DoesNotExist:
                 return JsonResponse({'error': '项目不存在或无权限访问'}, status=404)
         else:
             # 创建新项目
-            project = DesignProject.objects.create(
+            project = ProjectModel.objects.create(
                 name=name,
                 description=description,
                 parameters=parameters,
@@ -148,7 +148,7 @@ def delete_project(request):
         
         # 查找并删除项目
         try:
-            project = DesignProject.objects.get(id=project_id, user=user)
+            project = ProjectModel.objects.get(id=project_id, user=user)
             project_name = project.name
             project.delete()
             
@@ -156,7 +156,7 @@ def delete_project(request):
                 'success': True,
                 'message': f'项目"{project_name}"删除成功'
             }
-        except DesignProject.DoesNotExist:
+        except ProjectModel.DoesNotExist:
             return JsonResponse({'error': '项目不存在或无权限访问'}, status=404)
             
         return JsonResponse(response_data)
