@@ -9,5 +9,5 @@ urlpatterns = [
     path('editor/', views.editor, name='editor'),
     path('api/save-project/', views.save_project, name='save_project'),
     path('api/delete-project/', views.delete_project, name='delete_project'),
-    path('api/generator/', views.generator_api, name='generator_api'),  # 这个API原用于向后端传递用户在前端设定的参数，目前应该还用不到（？
+    path('api/test/', views.test, name='test')
 ]
