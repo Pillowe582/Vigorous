@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # Django REST Framework
+    'django_filters',  # 过滤器支持
     'web3d',
     'accounts',
 ]
