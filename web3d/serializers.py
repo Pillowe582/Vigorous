@@ -7,14 +7,35 @@ class PresetSerializer(serializers.ModelSerializer):
         model = PresetModel
         fields = '__all__'
         read_only_fields = ('user', 'created_at', 'edited_at')
+        
+class PieceListSerializer(serializers.ModelSerializer):
+    """棋子列表序列化器"""
+    class Meta:
+        model = PieceModel
+        fields = [
+            'id', 'name', 'description','piece_tags', 'type', 'created_at', 'edited_at'
+        ]
+        read_only_fields = ('user', 'created_at', 'edited_at')
 
 class PieceSerializer(serializers.ModelSerializer):
-    """棋子序列化器"""
+    """棋子详情序列化器"""
     
     class Meta:
         model = PieceModel
         fields = '__all__'
-        read_only_fields = ('user', 'created_at', 'edited_at')
+        read_only_fields = ( 'created_at', 'edited_at')
+        extra_kwargs={
+            'user': {'read_only': True},
+            'piece_tags': {'required': False},
+        }
+    def validate_project(self, value):
+        """
+        校验：确保该项目属于当前登录用户
+        """
+        user = self.context['request'].user
+        if value.user != user:
+            raise serializers.ValidationError("你没有权限在别人的项目下创建棋子！")
+        return value
     
     def create(self, validated_data):
         # 自动设置当前用户

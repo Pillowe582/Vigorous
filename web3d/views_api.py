@@ -9,7 +9,8 @@ from .serializers import (
     ProjectSerializer, 
     PieceSerializer, 
     TextureSerializer,
-    PresetSerializer
+    PresetSerializer,
+    PieceListSerializer
 )
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -45,23 +46,25 @@ class PieceViewSet(viewsets.ModelViewSet):
     棋子管理视图集
     支持项目筛选和详细信息查询
     """
-    serializer_class = PieceSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['project_id', 'type']
+    filterset_fields = ['project', 'type']
     search_fields = ['name', 'description']
     ordering_fields = ['created_at', 'edited_at', 'name']
-    ordering = ['-created_at']
+    ordering = ['-edited_at']
+    def get_serializer_class(self):
+        """
+        动态选择序列化器：
+        1. 访问列表(list)时，使用简略版。
+        2. 访问详情(retrieve)或创建(create)等时，使用完整版。
+        """
+        if self.action == 'list':
+            return PieceListSerializer
+        return PieceSerializer
 
     def get_queryset(self):
         queryset = PieceModel.objects.filter(user=self.request.user)
-        
-        # 支持通过url参数过滤项目下的棋子
-        project_id = self.request.query_params.get('project_id')
-        if project_id:
-            queryset = queryset.filter(project_id=project_id)
-            
-        return queryset.select_related('project_id', 'preset')
+        return queryset.select_related('project')
 
 class TextureViewSet(viewsets.ModelViewSet):
     """
