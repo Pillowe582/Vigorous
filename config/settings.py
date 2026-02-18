@@ -1,3 +1,4 @@
+
 """
 Django settings for Vigorous project.
 
@@ -12,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$zqowla76r@i4hm)d%+s=)5sanshx*%0_w#4%z)-e3wp(*(1qd'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['8.141.101.177','localhost','127.0.0.1']
-TRUSTED_PROXIES = ['127.0.0.1', '172.17.0.1']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+TRUSTED_PROXIES = config('TRUSTED_PROXIES', default='127.0.0.1', cast=Csv())
 
 # Application definition
 
@@ -77,7 +79,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-if os.environ.get('DATABASE_TYPE') != 'MYSQL':
+if config('DATABASE_TYPE', default='SQLITE') != 'MYSQL':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -88,15 +90,15 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'vigorous_db',
-            'USER': 'vigorous_user',
-            'PASSWORD': 'vigorous',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT'),
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             },
-    }
+        }
     }
     
 
@@ -125,32 +127,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Shanghai'
+TIME_ZONE = config('TIME_ZONE', default='UTC')
 
 USE_I18N = True
 
 USE_TZ = True
-
-# Authentication backends
-AUTHENTICATION_BACKENDS = [
-    'accounts.views.CaseInsensitiveAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Media files (用户上传的文件)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# WhiteNoise 配置，用于生产环境静态文件服务
-WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-X_FRAME_OPTIONS = 'SAMEORIGIN'
