@@ -18,10 +18,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('editor/', views.editor, name='editor'),
     
-    # 旧版API路由（保持兼容性）
-    path('api/save-project/', views.save_project, name='save_project'),
-    path('api/delete-project/', views.delete_project, name='delete_project'),
-    path('api/test/', views.test, name='test'),
+    
     
     # REST API路由
     path('', include(router.urls)),

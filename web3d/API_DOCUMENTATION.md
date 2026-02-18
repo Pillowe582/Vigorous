@@ -4,6 +4,8 @@
 
 本文档详细介绍了 Vigorous 项目的 RESTful API 接口，基于 Django REST Framework 构建，为前端 React 应用提供完整的数据交互能力。
 
+**若有冲突，以群里发的word为准**
+
 ## 认证方式
 
 所有 API 接口都需要用户认证，使用 Django 的 Session Authentication。

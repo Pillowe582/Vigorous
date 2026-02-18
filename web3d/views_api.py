@@ -17,10 +17,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     自定义权限：只有所有者才能修改自己的对象
     """
     def has_object_permission(self, request, view, obj):
-        # 读取权限允许任何请求
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        # 写入权限只给对象的所有者
         return obj.user == request.user
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -34,7 +30,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status']
     search_fields = ['name', 'description']
     ordering_fields = ['created_at', 'edited_at', 'name']
-    ordering = ['-created_at']
+    ordering = ['-edited_at']
 
     def get_queryset(self):
         # 只返回当前用户的项目，排除已删除的
@@ -42,16 +38,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             user=self.request.user
         ).select_related('user')
 
-    @action(detail=True, methods=['get'])
-    def pieces(self, request, pk=None):
-        """获取项目下的所有棋子"""
-        project = self.get_object()
-        pieces = PieceModel.objects.filter(
-            project_id=project,
-            user=request.user
-        ).select_related('preset')
-        serializer = PieceSerializer(pieces, many=True)
-        return Response(serializer.data)
+    
 
 class PieceViewSet(viewsets.ModelViewSet):
     """
