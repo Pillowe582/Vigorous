@@ -2,12 +2,29 @@ from rest_framework import serializers
 from .models import ProjectModel, PieceModel, TextureModel, PresetModel
 
 class PresetSerializer(serializers.ModelSerializer):
-    """预设棋子序列化器"""
+    """预设棋子详情序列化器"""
     class Meta:
         model = PresetModel
         fields = '__all__'
-        read_only_fields = ('user', 'created_at', 'edited_at')
+        read_only_fields = ('created_at', 'edited_at')
+        extra_kwargs={
+            'user': {'read_only': True},
+            'piece_tags': {'required': False},
+        }
+    def create(self, validated_data):
+        # 自动设置当前用户
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
         
+class PresetListSerializer(serializers.ModelSerializer):
+    """预设列表序列化器"""
+    class Meta:
+        model = PresetModel
+        fields = [
+            'id', 'name', 'description', 'piece_tags', 'type', 'created_at', 'edited_at'
+        ]
+        read_only_fields = ('user', 'created_at', 'edited_at')
+
 class PieceListSerializer(serializers.ModelSerializer):
     """棋子列表序列化器"""
     class Meta:

@@ -10,7 +10,6 @@ from .serializers import (
     PieceSerializer, 
     TextureSerializer,
     PresetSerializer,
-    PieceListSerializer
 )
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -59,6 +58,7 @@ class PieceViewSet(viewsets.ModelViewSet):
         2. 访问详情(retrieve)或创建(create)等时，使用完整版。
         """
         if self.action == 'list':
+            from .serializers import PieceListSerializer
             return PieceListSerializer
         return PieceSerializer
 
@@ -94,36 +94,27 @@ class TextureViewSet(viewsets.ModelViewSet):
 class PresetViewSet(viewsets.ModelViewSet):
     """
     预设棋子管理视图集
-    支持预设的创建、查询、分享等功能
+    支持预设的创建、查询、分享、转换为项目棋子等功能
     """
-    serializer_class = PresetSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['type']
     search_fields = ['name', 'description']
     ordering_fields = ['created_at', 'edited_at', 'name']
-    ordering = ['-created_at']
+    ordering = ['-edited_at']
+
+    def get_serializer_class(self):
+        """
+        动态选择序列化器：
+        1. 访问列表(list)时，使用不依赖项目的简略版。
+        2. 访问详情(retrieve)或创建(create)等时，使用完整版。
+        """
+        if self.action == 'list':
+            from .serializers import PresetListSerializer
+            return PresetListSerializer
+        return PresetSerializer
 
     def get_queryset(self):
         return PresetModel.objects.filter(user=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def duplicate(self, request, pk=None):
-        """复制预设为新的棋子"""
-        preset = self.get_object()
-        # 创建新的棋子实例
-        piece_data = {
-            'name': f"{preset.name}_副本",
-            'description': preset.description,
-            'parts': preset.parts,
-            'feature': preset.feature,
-            'piece_tags': preset.piece_tags,
-            'preset': preset.id,
-            'project_id': request.data.get('project_id')  # 需要指定项目ID
-        }
-        
-        serializer = PieceSerializer(data=piece_data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
