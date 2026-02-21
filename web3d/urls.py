@@ -17,6 +17,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
     path('editor/', views.editor, name='editor'),
+    path("api/getuser/", views.get_current_user, name="getuser"),
     
     
     
