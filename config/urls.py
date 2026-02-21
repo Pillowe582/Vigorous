@@ -15,7 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -23,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('web3d.urls')),
     path('', include('accounts.urls')),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
 ]
 
 # 开发环境下提供媒体文件服务
