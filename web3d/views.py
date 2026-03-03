@@ -27,7 +27,7 @@ def home(request):
 def about(request):
     """关于页面的视图函数"""
     return HttpResponse('<h1>关于我们?</h1>')
-def editor(request):
+def menu(request):
     return render(request, 'index.html')
 
 

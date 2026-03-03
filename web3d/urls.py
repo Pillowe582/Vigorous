@@ -16,7 +16,7 @@ urlpatterns = [
     # 传统页面路由
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
-    path('editor/', views.editor, name='editor'),
+    path('menu/',views.menu, name='menu'),
     path("api/getuser/", views.get_current_user, name="getuser"),
     
     

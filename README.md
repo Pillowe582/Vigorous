@@ -9,7 +9,7 @@ README.md
 "万物皆可自定义"——基于Web/移动端的轻量化3D模型生成器
 核心要求： 选择一个具体的使用场景（如手机壳、键帽、收纳盒等），构建一个轻量化的3D建模工具，允许普通用户通过简单的几何叠加、参数修改或AI生成，快速创作出具有功能性的3D实体。
 
-产品形式可以参考MakerWorld的花瓶生成器（https://makerworld.com.cn/makerlab/makeMyVase）、灯罩生成器（https://makerworld.com.cn/makerlab/makeMyLantern）等。
+产品形式可以参考MakerWorld的[花瓶生成器](https://makerworld.com.cn/makerlab/makeMyVase)、[灯罩生成器](https://makerworld.com.cn/makerlab/makeMyLantern)等。
 
 
 其余最佳类奖项不受影响。
