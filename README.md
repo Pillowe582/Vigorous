@@ -1,6 +1,11 @@
 README.md
 # Vigorous 衡有锦深！
 
+> ### 注：该Readme为极早期时的版本，尚未更新。此处为一些项目与仓库的基本信息。
+> - 这里是后端仓库，直接与[服务器](http://8.141.101.177:8000/)对接。
+> - 前端仓库见[这里](https://github.com/Danieltoraji/Vigorous-React-Three-Fiber-Part)（虽然好像还是private）
+> - 前端React项目会定期打包并同步到本仓库
+
 这是一个基于 Django 框架的 Web 应用程序，由于目前没有新的idea，暂时先按照3d赛道开发
 ### 3D赛道具体信息
 
