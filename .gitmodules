@@ -1,0 +1,3 @@
+[submodule "React"]
+	path = React
+	url = https://github.com/Danieltoraji/Vigorous-React-Three-Fiber-Part.git
