@@ -22,8 +22,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('web3d.urls')),
+    # 认证相关路径必须在主应用之前注册
     path('', include('accounts.urls')),
+    path('', include('web3d.urls')),
     re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
 ]
 

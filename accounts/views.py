@@ -117,7 +117,11 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user() # AuthenticationForm 特有方法，直接获取验证成功的用户
             login(request, user)
-            return redirect('web3d:home')
+            # 如果有 next 参数，跳转到原始请求页面；否则跳转到编辑器页面
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('web3d:menu')  # 默认跳转到模型编辑器
         else:
             messages.error(request, amsg.LOGIN_FAILED)
     else:
