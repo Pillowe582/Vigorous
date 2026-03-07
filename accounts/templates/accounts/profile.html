@@ -10,7 +10,7 @@
 <body>
     <div class="profile-container">
         <div class="profile-header">
-            <h1>用户管理</h1>
+            <h1>用户信息管理</h1>
             <a href="{% url 'web3d:home' %}" class="back-link">← 返回首页</a>
         </div>
 
@@ -42,13 +42,13 @@
                     {% csrf_token %}
                     
                     <div class="form-group">
-                        <label for="new_username">新用户名:</label>
+                        <label for="new_username">更换新用户名:</label>
                         <input type="text" id="new_username" name="new_username" value="{{ user.username }}" maxlength="150">
                         <small class="help-text">用户名只能包含字母、数字和@/./+/-/_字符，不能包含空格，长度不超过150个字符</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="avatar">头像:</label>
+                        <label for="avatar">更换头像:</label>
                         <div class="file-upload-wrapper">
                             <input type="file" id="avatar" name="avatar" accept="image/*" class="file-input">
                             <label for="avatar" class="file-upload-btn">
@@ -57,11 +57,11 @@
                                 <span class="file-name">未选择文件</span>
                             </label>
                         </div>
-                        <small class="help-text">支持 JPG、PNG 格式，建议尺寸 200x200 像素</small>
+                        <small class="help-text">支持 JPG、PNG 格式，建议尺寸 200x200 像素，可拖拽上传</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="new_password">新密码:</label>
+                        <label for="new_password">更换新密码:</label>
                         <input type="password" id="new_password" name="new_password" placeholder="留空则不修改密码">
                         <small class="help-text">密码需满足安全性要求（至少8位，不能与用户名相似等）</small>
                     </div>
