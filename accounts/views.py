@@ -121,7 +121,7 @@ def login_view(request):
             next_url = request.GET.get('next')
             if next_url:
                 return redirect(next_url)
-            return redirect('web3d:menu')  # 默认跳转到模型编辑器
+            return redirect('web3d:home') 
         else:
             messages.error(request, amsg.LOGIN_FAILED)
     else:
