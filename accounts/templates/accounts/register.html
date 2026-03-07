@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户注册 - 3D模型生成器</title>
+    <title>用户注册 - 3D棋子生成器</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'accounts/css/register.css' %}">
 </head>
 <body>
     <div class="register-container">
         <div class="logo">
-            <h1>📝 注册</h1>
+            <h1>注册</h1>
             <p>创建您的3D创作账户</p>
         </div>
 
@@ -82,11 +82,12 @@
         </form>
 
         <div class="divider">
-            <span>已有账户？</span>
+            <span>已有账户？<a href="{% url 'accounts:login' %}">立即登录</a></span>
+            
         </div>
 
         <div class="links">
-            <p><a href="{% url 'accounts:login' %}">立即登录</a></p>
+            
             <p style="margin-top: 10px;"><a href="{% url 'web3d:home' %}">返回首页</a></p>
         </div>
     </div>

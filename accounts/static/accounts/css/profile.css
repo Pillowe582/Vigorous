@@ -1,14 +1,14 @@
 /* 拖拽上传效果 */
 .file-upload-btn.drag-over {
     transform: scale(1.05);
-    border-color: rgba(255, 255, 255, 0.8);
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    border-color: rgba(0, 212, 255, 0.8);
+    background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
 }
 
 /* 选中文件后的特殊样式 */
 .file-selected {
-    background: linear-gradient(135deg, #d2ffd3 0%, #bbffbe 100%) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(16, 185, 129, 0.5) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.6) !important;
 }
 
 .file-selected .upload-icon {
@@ -53,19 +53,19 @@
     align-items: center;
     gap: 12px;
     padding: 12px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     color: white;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border: 2px dashed rgba(162, 162, 162, 0.3);
     font-weight: 500;
     user-select: none;
 }
 
 .file-upload-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px #999999;
     border-style: solid;
 }
 
@@ -101,12 +101,12 @@
 
 /* 当文件被选中时的样式 */
 .file-input:focus+.file-upload-btn {
-    outline: 2px solid #667eea;
+    outline: 2px solid #393939;
     outline-offset: 2px;
 }
 
 .file-input:valid+.file-upload-btn {
-    background: linear-gradient(135deg, #dfdeff 0%, #fcc9ff 100%);
+    background: linear-gradient(135deg, #dbdbdb 0%, #7b7b7b 100%);
     border-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -127,7 +127,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -140,6 +140,7 @@ body {
 .profile-header {
     display: flex;
     justify-content: space-between;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     align-items: center;
     margin-bottom: 30px;
     color: white;
@@ -217,14 +218,14 @@ body {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #667eea;
+    border: 3px solid #393939;
 }
 
 .avatar-placeholder {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -232,7 +233,7 @@ body {
     font-size: 3rem;
     font-weight: bold;
     margin: 0 auto;
-    border: 3px solid #667eea;
+    border: 3px solid #393939;
 }
 
 .user-nickname {
@@ -266,7 +267,7 @@ body {
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #393939;
 }
 
 .help-text {
@@ -298,13 +299,13 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px #666666;
 }
 
 .btn-secondary {
@@ -315,7 +316,7 @@ body {
 
 .btn-secondary:hover {
     background: #e9ecef;
-    border-color: #adb5bd;
+    border-color: #666666;
 }
 
 /* 响应式设计 */
