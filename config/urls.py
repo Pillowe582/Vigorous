@@ -25,7 +25,13 @@ urlpatterns = [
     # 认证相关路径必须在主应用之前注册
     path('', include('accounts.urls')),
     path('', include('web3d.urls')),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
+    
+    # React 页面入口
+    re_path(r'^menu/?$', TemplateView.as_view(template_name="index.html")),
+    re_path(r'^explorer-.*$', TemplateView.as_view(template_name="index.html")),
+    re_path(r'^project-editor/.*$', TemplateView.as_view(template_name="index.html")),
+    re_path(r'^chess-editor/.*$', TemplateView.as_view(template_name="index.html")),
+    # re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
 ]
 
 # 开发环境下提供媒体文件服务

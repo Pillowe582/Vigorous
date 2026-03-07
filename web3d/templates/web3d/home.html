@@ -18,7 +18,11 @@
                 <!-- 已登录用户显示头像和下拉菜单 -->
                 <div class="user-dropdown">
                     <div class="user-info" id="userDropdown">
-                        <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="avatar-img">
+                        {% else %}
+                            <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+                        {% endif %}
                         <span class="username">{{ user.username }}</span>
                         <span class="dropdown-arrow">▼</span>
                     </div>
