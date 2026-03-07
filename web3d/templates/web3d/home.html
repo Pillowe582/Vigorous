@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D 模型生成器 - 首页</title>
+    <title>衡有锦深牌3D棋子生成器 - 首页</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'homepage/css/style.css' %}">
 </head>
 <body>
+    <!-- 新增背景层 -->
+    <div class="background-layer"></div>
+    
     <header class="header">
         <div class="logo">3D 棋子模型生成器</div>
         <div class="auth-container">
@@ -363,9 +366,8 @@
                 // 居中绘制（考虑呼吸效果的偏移）
                 const x = state.centerX - drawWidth / 2;
                 const y = state.centerY - drawHeight / 2;
-                
                 ctx.drawImage(imageToDraw, x, y, drawWidth, drawHeight);
-                
+                removeWhite(ctx, x, y, drawWidth, drawHeight);
                 // 恢复画布状态
                 ctx.restore();
               
@@ -374,7 +376,23 @@
                 drawPlaceholder();
             }
         }
+        function removeWhite(ctx, x, y, w, h) {
+            const imgData = ctx.getImageData(x, y, w, h);
+            const data = imgData.data;
 
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+
+                // 判断接近白色
+                if (r > 250 && g > 250 && b > 250) {
+                    data[i+3] = 0; // 透明
+                }
+            }
+
+            ctx.putImageData(imgData, x, y);
+        }
         // ==================== 旋转动画逻辑 ====================
         function updateRotation() {
             const currentTime = Date.now();
