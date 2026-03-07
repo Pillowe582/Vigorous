@@ -6,19 +6,26 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #fcfcfc;
     min-height: 100vh;
     color: #333;
+    overflow-x: hidden;
 }
 
 .header {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     padding: 20px 5%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .logo {
@@ -291,127 +298,65 @@ h1 {
     line-height: 1.6;
 }
 
-/* 项目列表相关样式 */
-.projects-section {
-    margin-top: 40px;
+
+/* 棋子展示容器 - 新增核心样式 */
+.chess-display-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    pointer-events: none;
+    /* 让鼠标事件穿透到 canvas */
 }
 
-.projects-section h2 {
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 30px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+#chessCanvas {
+    display: block;
+    pointer-events: auto;
+    /* canvas 本身可以接收鼠标事件 */
+    touch-action: none;
+    /* 防止移动端默认触摸行为 */
 }
 
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
-}
-
-.project-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    text-align: left;
-}
-
-.project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-.project-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.project-title {
-    font-size: 1.3rem;
-    margin: 10px 0 10px 0;
-    color: #4a5568;
-    word-break: break-word;
-}
-
-.project-meta {
-    color: #718096;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.project-status {
-    margin-bottom: 15px;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.status-draft {
-    background: #e2e8f0;
-    color: #4a5568;
-}
-
-.status-generating {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status-completed {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-archived {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.project-actions {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-    text-align: center;
-}
-
-.empty-projects {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 40px;
-    margin-top: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.empty-projects p {
+.click-hint {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 1.2rem;
-    color: #718096;
-}
-
-.empty-projects a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.empty-projects a:hover {
-    text-decoration: underline;
-}
-
-footer {
+    font-weight: 500;
     text-align: center;
-    padding: 30px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 50px;
+    padding: 15px 30px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+footer,
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+
+    font-size: 1.1rem;
+    z-index: 10;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    backdrop-filter: blur(5px);
+    border-radius: 0;
 }
 
 /* 退出确认弹框样式 */
@@ -540,8 +485,14 @@ footer {
     .username {
         font-size: 14px;
     }
-    
+
     .projects-grid {
-        grid-template-columns: 1fr; /* 在小屏幕上单列显示 */
+        grid-template-columns: 1fr;
+    }
+
+    .click-hint {
+        font-size: 1rem;
+        padding: 12px 20px;
+        bottom: 15%;
     }
 }

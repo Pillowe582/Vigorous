@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D模型生成器 - 首页</title>
+    <title>3D 模型生成器 - 首页</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'homepage/css/style.css' %}">
 </head>
 <body>
     <header class="header">
-        <div class="logo">🎨 3D模型生成器</div>
+        <div class="logo">3D 棋子模型生成器</div>
         <div class="auth-container">
             {% if user.is_authenticated %}
                 <!-- 已登录用户显示头像和下拉菜单 -->
@@ -27,75 +27,18 @@
             {% else %}
                 <!-- 未登录用户显示登录按钮 -->
                 <div class="auth-buttons">
-                    <button class="btn btn-login" onclick="window.location.href='{% url "accounts:login" %}'">登录</button>
+                    <button class="btn btn-login" onclick="window.location.href='{% url "accounts:login" %}'">注册或登录</button>
                 </div>
             {% endif %}
         </div>
     </header>
 
-    <div class="container">
-        <section class="welcome-section">
-            <h1>欢迎，{{ username }}！</h1>
-            <p class="subtitle">在这里创造属于你的独特3D世界，从简单的几何体开始，打造复杂的数字艺术品</p>
-            
-            <a href="{% url 'web3d:menu' %}" class="editor-button">
-                🎨 进入3D模型编辑器（NEW）
-            </a>
-        <br>
-            <p style="margin-top: 30px; color: #718096;">这里是我们的3D模型生成器雏形，更多功能正在开发中...</p>
-        </section>
-
-        {% if user.is_authenticated %}
-        <!-- 已登录用户显示项目列表 -->
-        <section class="projects-section">
-            <h2>我的项目</h2>
-            {% if user_projects %}
-            <div class="projects-grid">
-                {% for project in user_projects %}
-                <div class="project-card">
-                    <div class="project-icon">📦</div>
-                    <h3 class="project-title">{{ project.name }}</h3>
-                    <p class="project-meta">创建于 {{ project.created_at|date:"Y-m-d H:i" }}</p>
-                    <p class="project-meta">修改于 {{ project.edited_at|date:"Y-m-d H:i" }}</p>
-                    <div class="project-status">
-                        <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
-                    </div>
-                    <div class="project-actions">
-                        <button class="btn btn-small" onclick="loadProject({{ project.id }})">编辑</button>
-                        <button class="btn btn-small btn-secondary" onclick="downloadProject({{ project.id }})">下载</button>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-projects">
-                <p>您还没有任何项目。您可以 <a href="{% url 'web3d:menu' %}">创建第一个项目</a>。</p>
-            </div>
-            {% endif %}
-        </section>
-        {% else %}
-        <!-- 未登录用户显示功能介绍 -->
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">📐</div>
-                <h3 class="feature-title">参数化建模</h3>
-                <p class="feature-desc">通过调整参数快速生成各种基础几何形状，无需复杂的专业知识</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">实时预览</h3>
-                <p class="feature-desc">所见即所得的编辑体验，在线实时渲染您的3D创作</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">📤</div>
-                <h3 class="feature-title">导出分享</h3>
-                <p class="feature-desc">支持多种格式导出，轻松分享您的3D作品给朋友</p>
-            </div>
-        </div>
-        {% endif %}
+    <!-- 棋子展示容器 -->
+    <div class="chess-display-container">
+        <canvas id="chessCanvas"></canvas>
     </div>
+    
+    <div class="footer">2026 衡有锦深</div>
 
     <!-- 退出登录确认弹框 -->
     <div id="logoutModal" class="modal">
@@ -113,26 +56,410 @@
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 3D模型生成器 | 让创意变为现实</p>
-    </footer>
-
     <script>
-        // 下拉菜单功能
-        document.addEventListener('DOMContentLoaded', function() {
-            const userDropdown = document.getElementById('userDropdown');
-            const dropdownMenu = document.getElementById('dropdownMenu');
+        // ==================== 配置参数 ====================
+        const CONFIG = {
+            // 草稿序列帧数
+            SKETCH_FRAMES: 16,
+            // 草稿序列图片路径模板（请根据实际路径修改）
+            SKETCH_PATH_TEMPLATE: '/static/homepage/chess/sketch_{frame}.png',
+            // 3D 模型图片路径
+            MODEL_3D_PATH: '/static/homepage/chess/model_3d.png',
+            // 写实渲染图片路径
+            REALISTIC_PATH: '/static/homepage/chess/realistic.png',
             
+            // 悬停检测区域大小
+            HOVER_AREA_SIZE: 300,           // 棋子周围检测区域
+            // 动画平滑系数
+            SMOOTHING_FACTOR: 0.1,
+            
+        };
+
+        // ==================== 状态管理 ====================
+        const state = {
+            mouseX: 0,
+            mouseY: 0,
+            targetMouseX: 0,
+            targetMouseY: 0,
+            currentFrame: 2, // 初始化为第二张
+            targetFrame: 2, // 默认目标为第二张
+            currentState: 'sketch', // 'sketch', '3d', 'realistic'
+            isHovering: false,
+            centerX: 0,
+            centerY: 0,
+            chessSize: 300, // 棋子显示大小
+            images: {
+                sketches: [],
+                model3D: null,
+                realistic: null
+            },
+            imagesLoaded: false,
+            breathTime: 0, // 呼吸效果时间计数器
+            breathScale: 1, // 呼吸效果缩放比例
+            // 旋转动画相关
+            rotationAngle: 0, // 当前旋转角度
+            rotationStartTime: 0, // 旋转开始时间
+            lastRotationTime: 0, // 上次旋转触发时间
+            isRotating: false // 是否正在旋转
+        };
+
+        // ==================== DOM 元素 ====================
+        let canvas, ctx;
+
+        // ==================== 初始化 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            preloadImages();
+            setupEventListeners();
+            updateCenterPosition();
+            
+            // 启动渲染循环
+            requestAnimationFrame(renderLoop);
+        });
+
+        // ==================== Canvas 初始化 ====================
+        function initCanvas() {
+            canvas = document.getElementById('chessCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置 Canvas 尺寸
+            resizeCanvas();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                resizeCanvas();
+                updateCenterPosition();
+            });
+        }
+
+        function resizeCanvas() {
+            const container = document.querySelector('.chess-display-container');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // 更新中心位置
+            updateCenterPosition();
+        }
+
+        function updateCenterPosition() {
+            state.centerX = canvas.width / 2;
+            state.centerY = canvas.height / 2;
+            state.chessSize = Math.min(canvas.width, canvas.height) * 0.52;
+        }
+
+        // ==================== 图片预加载 ====================
+        function preloadImages() {
+            let loadedCount = 0;
+            const totalImages = CONFIG.SKETCH_FRAMES + 2; // 草稿序列 + 3D 模型 + 写实渲染
+
+            // 加载草稿序列
+            for (let i = 1; i <= CONFIG.SKETCH_FRAMES; i++) {
+                const img = new Image();
+                img.src = CONFIG.SKETCH_PATH_TEMPLATE.replace('{frame}', i);
+                img.onload = () => {
+                    loadedCount++;
+                    checkLoadComplete(loadedCount, totalImages);
+                };
+                img.onerror = () => {
+                    console.warn(`草稿图片 ${i} 加载失败，使用占位图`);
+                    loadedCount++;
+                    checkLoadComplete(loadedCount, totalImages);
+                };
+                state.images.sketches.push(img);
+            }
+
+            // 加载 3D 模型图片
+            state.images.model3D = new Image();
+            state.images.model3D.src = CONFIG.MODEL_3D_PATH;
+            state.images.model3D.onload = () => {
+                loadedCount++;
+                checkLoadComplete(loadedCount, totalImages);
+            };
+            state.images.model3D.onerror = () => {
+                console.warn('3D 模型图片加载失败');
+                loadedCount++;
+                checkLoadComplete(loadedCount, totalImages);
+            };
+
+            // 加载写实渲染图片
+            state.images.realistic = new Image();
+            state.images.realistic.src = CONFIG.REALISTIC_PATH;
+            state.images.realistic.onload = () => {
+                loadedCount++;
+                checkLoadComplete(loadedCount, totalImages);
+            };
+            state.images.realistic.onerror = () => {
+                console.warn('写实渲染图片加载失败');
+                loadedCount++;
+                checkLoadComplete(loadedCount, totalImages);
+            };
+        }
+
+        function checkLoadComplete(loaded, total) {
+            if (loaded >= total) {
+                state.imagesLoaded = true;
+                console.log('所有图片加载完成');
+            }
+        }
+
+        // ==================== 事件监听器 ====================
+        function setupEventListeners() {
+            // 鼠标移动事件
+            canvas.addEventListener('mousemove', handleMouseMove);
+            
+            // 鼠标离开事件
+            canvas.addEventListener('mouseleave', handleMouseLeave);
+            
+            // 点击事件
+            canvas.addEventListener('click', handleClick);
+            
+            // 触摸事件（移动端支持）
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            state.targetMouseX = e.clientX - rect.left;
+            state.targetMouseY = e.clientY - rect.top;
+        }
+
+        function handleMouseLeave() {
+            // 鼠标离开时重置到边缘位置
+            state.targetMouseX = 0;
+            state.targetMouseY = 0;
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            state.targetMouseX = touch.clientX - rect.left;
+            state.targetMouseY = touch.clientY - rect.top;
+        }
+
+        function handleTouchEnd() {
+            handleClick();
+        }
+
+        function handleClick() {
+            if (state.isHovering || state.currentState === 'realistic') {
+                // 点击进入 3D 编辑器
+                window.location.href = '{% url "web3d:menu" %}';
+            }
+        }
+
+        // ==================== 核心逻辑 ====================
+        function updateState() {
+            // 更新呼吸效果时间
+            state.breathTime += 0.01; // 调整这个值可以改变呼吸速度
+            // 使用正弦函数计算呼吸缩放比例，范围在 0.95 到 1.05 之间
+            state.breathScale = 1 + 0.03 * Math.sin(state.breathTime);
+            
+            // 平滑鼠标位置
+            state.mouseX += (state.targetMouseX - state.mouseX) * CONFIG.SMOOTHING_FACTOR;
+            state.mouseY += (state.targetMouseY - state.mouseY) * CONFIG.SMOOTHING_FACTOR;
+
+            // 计算鼠标到中心的距离
+            const dx = state.mouseX - state.centerX;
+            const dy = state.mouseY - state.centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // 检测是否在棋子上方悬停
+            const hoverDistance = Math.min(state.chessSize * 0.25, 150);
+            state.isHovering = distance < hoverDistance;
+            const maxmiumDistance = 0.5*Math.sqrt(window.innerHeight*window.innerHeight+window.innerWidth*window.innerWidth);
+            const model3dThersholdRatio=0.2;
+            // 根据距离决定显示状态
+            if (state.isHovering) {
+                state.currentState = 'realistic';
+                state.chessSize=Math.min(canvas.width, canvas.height) * 0.4
+                state.targetFrame = 0;
+                canvas.style.cursor = 'pointer';
+            } else if (distance < maxmiumDistance*model3dThersholdRatio) {
+                state.currentState = '3d';
+                state.chessSize=Math.min(canvas.width, canvas.height) * 0.4
+                state.targetFrame = 0;
+                canvas.style.cursor = 'default';
+            } else if (distance < maxmiumDistance) {
+                canvas.style.cursor = 'default';
+                state.currentState = 'sketch';
+                state.chessSize=Math.min(canvas.width, canvas.height) * 0.52
+                // 根据距离计算目标帧
+                const ratio = (distance - maxmiumDistance*model3dThersholdRatio) / 
+                             (maxmiumDistance* (1-model3dThersholdRatio) );
+                state.targetFrame = Math.ceil(16/(15*Math.pow(ratio,1)+1)-1)+1;
+            } else {
+                state.currentState = 'sketch';
+                state.targetFrame = 2; // 显示第二张
+            }
+
+            // 平滑过渡帧
+            if (state.currentState === 'sketch') {
+                state.currentFrame += (state.targetFrame - state.currentFrame) * CONFIG.SMOOTHING_FACTOR;
+            }
+        }
+
+        // ==================== 渲染循环 ====================
+        function renderLoop() {
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 更新状态
+            updateState();
+
+
+            // 绘制棋子
+            drawChess();
+
+
+            // 继续下一帧
+            requestAnimationFrame(renderLoop);
+        }
+
+        
+
+        function drawChess() {
+            let imageToDraw = null;
+            
+            if (state.currentState === 'sketch') {
+                // 绘制草稿序列帧
+                const frameIndex = Math.round(state.currentFrame) - 1;
+                if (frameIndex >= 0 && frameIndex < state.images.sketches.length) {
+                    imageToDraw = state.images.sketches[frameIndex];
+                }
+            } else if (state.currentState === '3d') {
+                imageToDraw = state.images.model3D;
+            } else if (state.currentState === 'realistic') {
+                imageToDraw = state.images.realistic;
+            }
+
+            if (imageToDraw && imageToDraw.complete && imageToDraw.naturalWidth > 0) {
+                // 更新旋转动画状态
+                updateRotation();
+                
+                // 计算绘制尺寸（保持宽高比）
+                const aspectRatio = imageToDraw.width / imageToDraw.height;
+                let drawWidth = state.chessSize * state.breathScale; // 应用呼吸效果
+                let drawHeight = state.chessSize / aspectRatio * state.breathScale; // 应用呼吸效果
+                
+                if (drawHeight > state.chessSize) {
+                    drawHeight = state.chessSize * state.breathScale;
+                    drawWidth = state.chessSize * aspectRatio * state.breathScale;
+                }
+
+                // 保存当前画布状态
+                ctx.save();
+                
+                // 平移到棋子中心
+                ctx.translate(state.centerX, state.centerY);
+                
+                // 应用旋转
+                ctx.rotate(state.rotationAngle * Math.PI / 180);
+                
+                // 平移回原位置
+                ctx.translate(-state.centerX, -state.centerY);
+                
+                // 居中绘制（考虑呼吸效果的偏移）
+                const x = state.centerX - drawWidth / 2;
+                const y = state.centerY - drawHeight / 2;
+                
+                ctx.drawImage(imageToDraw, x, y, drawWidth, drawHeight);
+                
+                // 恢复画布状态
+                ctx.restore();
+              
+            } else {
+                // 图片未加载时显示占位符
+                drawPlaceholder();
+            }
+        }
+
+        // ==================== 旋转动画逻辑 ====================
+        function updateRotation() {
+            const currentTime = Date.now();
+            
+            // 检测是否应该开始旋转（每 2 秒触发一次）
+            if (state.isHovering && !state.isRotating && 
+                currentTime - state.lastRotationTime >= 2000) {
+                state.isRotating = true;
+                state.rotationStartTime = currentTime;
+                state.lastRotationTime = currentTime;
+            }
+            
+            // 如果不悬停，重置旋转状态
+            if (!state.isHovering) {
+                state.isRotating = false;
+                state.rotationAngle = 0;
+                return;
+            }
+            
+            // 如果正在旋转，计算当前角度
+            if (state.isRotating) {
+                const elapsed = currentTime - state.rotationStartTime;
+                
+                // 每次旋转持续 600ms (200ms 去，200ms 回，重复 3 次)
+                const cycleDuration = 400; // 每个周期 400ms
+                const totalCycles = 3;
+                const totalTime = cycleDuration * totalCycles;
+                
+                if (elapsed < totalTime) {
+                    // 计算当前在第几个周期 (0, 1, 2)
+                    const currentCycle = Math.floor(elapsed / cycleDuration);
+                    // 当前周期内的进度 (0-1)
+                    const progress = (elapsed % cycleDuration) / cycleDuration;
+                    
+                    // 使用正弦波实现平滑的来回摆动
+                    const direction = currentCycle % 2 === 0 ? 1 : -1;
+                    state.rotationAngle = direction * 5 * Math.sin(progress * Math.PI);
+                } else {
+                    // 旋转完成
+                    state.isRotating = false;
+                    state.rotationAngle = 0;
+                }
+            }
+        }
+
+        function drawPlaceholder() {
+            // 绘制圆形占位符（应用呼吸效果）
+            const breathRadius = (state.chessSize / 2) * state.breathScale;
+            ctx.beginPath();
+            ctx.arc(state.centerX, state.centerY, breathRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // 绘制文字
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('加载中...', state.centerX, state.centerY);
+        }
+
+      
+
+        // ==================== 辅助函数 ====================
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        }
+
+        // ==================== 下拉菜单功能（保留原有逻辑）====================
+        const userDropdown = document.getElementById('userDropdown');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        
+        if (userDropdown) {
             userDropdown.addEventListener('click', function(e) {
                 e.stopPropagation();
                 dropdownMenu.classList.toggle('show');
             });
             
-            // 点击其他地方关闭下拉菜单
             document.addEventListener('click', function() {
                 dropdownMenu.classList.remove('show');
             });
-        });
+        }
         
         // 退出登录确认功能
         function confirmLogout() {
@@ -144,7 +471,6 @@
         }
         
         function performLogout() {
-            // 发送POST请求到登出URL
             fetch('{% url "accounts:logout" %}', {
                 method: 'POST',
                 headers: {
@@ -165,7 +491,6 @@
             });
         }
         
-        // 获取CSRF token
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -181,16 +506,8 @@
             return cookieValue;
         }
         
-        // 项目操作函数
-        function loadProject(projectId) {
-            // 重定向到编辑器页面并传递项目ID
-            window.location.href = '{% url "web3d:menu" %}?project_id=' + projectId;
-        }
         
-        function downloadProject(projectId) {
-            // TODO: 实现下载项目的逻辑
-            alert("下载项目ID: " + projectId);
-        }
     </script>
+
 </body>
 </html>
