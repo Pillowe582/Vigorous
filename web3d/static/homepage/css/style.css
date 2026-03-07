@@ -25,7 +25,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     padding: 20px 5%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -72,7 +72,7 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,7 +180,7 @@ body {
 .btn-small {
     padding: 8px 15px;
     font-size: 0.9rem;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     color: white;
     border: none;
     border-radius: 6px;
@@ -222,7 +222,7 @@ h1 {
     font-size: 3rem;
     margin-bottom: 20px;
     color: #4a5568;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -235,42 +235,7 @@ h1 {
     line-height: 1.6;
 }
 
-.editor-button {
-    display: inline-block;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    color: white;
-    padding: 18px 40px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    margin: 20px 0;
-}
 
-.editor-button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
-}
-
-.react-app-button {
-    display: inline-block;
-    background: linear-gradient(45deg, #28a745, #218838);
-    color: white;
-    padding: 12px 30px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-}
-
-.react-app-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(40, 167, 69, 0.6);
-}
 
 .features {
     display: grid;
@@ -365,7 +330,7 @@ footer,
     font-size: 1.1rem;
     z-index: 10;
     padding: 10px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     backdrop-filter: blur(5px);
     border-radius: 0;
 }
@@ -408,7 +373,7 @@ footer,
 }
 
 .modal-header {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #202020 0%, #393939 100%);
     color: white;
     padding: 20px;
     text-align: center;
