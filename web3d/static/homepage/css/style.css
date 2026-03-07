@@ -4,13 +4,33 @@
     box-sizing: border-box;
 }
 
+/* 确保 html 和 body 完全全屏无边距 */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 /* 新增背景层样式 */
 .background-layer {
     position: fixed;
-    inset: 0;
+    inset: -10%;
+    /* 扩大范围，确保边缘完全覆盖 */
     background: url('/static/homepage/bg/bg.png') no-repeat center center;
-    background-size: cover;
+    /* 使用 cover+ 确保完全覆盖，避免视差移动时露出边缘 */
+    background-size: 100% 100%;
     z-index: -1;
+    /* 支持硬件加速，提升变换性能 */
+    will-change: transform;
+    /* 确保变换平滑 */
+    backface-visibility: hidden;
+    /* 强制消除任何可能的边框或间隙 */
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 body {
@@ -31,6 +51,7 @@ body {
     align-items: center;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
     position: fixed;
+
     top: 0;
     left: 0;
     right: 0;
@@ -286,6 +307,10 @@ h1 {
     z-index: 1;
     pointer-events: none;
     /* 让鼠标事件穿透到 canvas */
+    /* 确保容器没有任何边距或边框 */
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
 }
 
 #chessCanvas {
@@ -296,6 +321,10 @@ h1 {
     /* 防止移动端默认触摸行为 */
     mix-blend-mode: multiply;
     /* 关键：变暗混合模式，使 canvas 内容（黑色线稿）与背景纸张纹理混合，产生铅笔画效果 */
+    /* 确保 canvas 完全覆盖 */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .click-hint {

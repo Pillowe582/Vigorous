@@ -76,6 +76,9 @@
             // 动画平滑系数
             SMOOTHING_FACTOR: 0.1,
             
+            // 背景视差效果配置
+            BACKGROUND_PARALLAX_ENABLED: true,  // 启用背景跟随鼠标移动
+            BACKGROUND_PARALLAX_INTENSITY: 0.02,  // 背景移动强度（0-1，值越小移动幅度越大）
         };
 
         // ==================== 状态管理 ====================
@@ -108,6 +111,7 @@
 
         // ==================== DOM 元素 ====================
         let canvas, ctx;
+        let backgroundLayer;  // 背景层元素引用
 
         // ==================== 初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -115,6 +119,9 @@
             preloadImages();
             setupEventListeners();
             updateCenterPosition();
+            
+            // 获取背景层元素
+            backgroundLayer = document.querySelector('.background-layer');
             
             // 启动渲染循环
             requestAnimationFrame(renderLoop);
@@ -263,6 +270,11 @@
             state.mouseX += (state.targetMouseX - state.mouseX) * CONFIG.SMOOTHING_FACTOR;
             state.mouseY += (state.targetMouseY - state.mouseY) * CONFIG.SMOOTHING_FACTOR;
 
+            // 更新背景视差效果
+            if (CONFIG.BACKGROUND_PARALLAX_ENABLED && backgroundLayer) {
+                updateBackgroundParallax();
+            }
+
             // 计算鼠标到中心的距离
             const dx = state.mouseX - state.centerX;
             const dy = state.mouseY - state.centerY;
@@ -301,6 +313,21 @@
             if (state.currentState === 'sketch') {
                 state.currentFrame += (state.targetFrame - state.currentFrame) * CONFIG.SMOOTHING_FACTOR;
             }
+        }
+
+        // ==================== 背景视差效果 ====================
+        function updateBackgroundParallax() {
+            // 计算鼠标相对于窗口中心的位置偏移（归一化到 -0.5 到 0.5）
+            const normalizedX = (state.mouseX / window.innerWidth) - 0.5;
+            const normalizedY = (state.mouseY / window.innerHeight) - 0.5;
+            
+            // 应用视差移动，移动方向与鼠标方向相反，创造深度感
+            const moveX = -normalizedX * window.innerWidth * CONFIG.BACKGROUND_PARALLAX_INTENSITY;
+            const moveY = -normalizedY * window.innerHeight * CONFIG.BACKGROUND_PARALLAX_INTENSITY;
+            
+            // 应用变换到背景层
+            backgroundLayer.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            backgroundLayer.style.transition = 'transform 0.1s ease-out'; // 平滑过渡
         }
 
         // ==================== 渲染循环 ====================
