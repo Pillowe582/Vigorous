@@ -138,7 +138,7 @@ class TextureModelAdmin(admin.ModelAdmin):
             'fields': ('name', 'user', 'file')
         }),
         ('纹理参数', {
-            'fields': ('texture_tags', 'composition'),
+            'fields': ('texture_tags',),
             'classes': ('collapse',)
         }),
         ('时间信息', {
