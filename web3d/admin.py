@@ -1,7 +1,7 @@
 # web3d/admin.py
 
 from django.contrib import admin
-from .models import ProjectModel, PresetModel, PieceModel, TextureModel
+from .models import ProjectModel, PresetModel, PieceModel, TextureModel, DecorationModel
 
 admin.site.site_header = "3D模型生成器管理后台"
 admin.site.site_title = "3D生成器管理"
@@ -115,13 +115,13 @@ class PieceModelAdmin(admin.ModelAdmin):
 @admin.register(TextureModel)
 class TextureModelAdmin(admin.ModelAdmin):
     # 在列表页显示的字段
-    list_display = ('id','name', 'user', 'source', 'created_at')
+    list_display = ('id','name', 'user', 'created_at')
     
     # 可搜索的字段
     search_fields = ('name', 'user__username')
     
     # 右侧过滤器
-    list_filter = ('source', 'created_at', 'user')
+    list_filter = ('created_at', 'user')
     
     # 按创建时间降序排列
     ordering = ('-created_at',)
@@ -135,10 +135,45 @@ class TextureModelAdmin(admin.ModelAdmin):
     # 字段分组显示
     fieldsets = (
         ('基本信息', {
-            'fields': ('name', 'user', 'file', 'source')
+            'fields': ('name', 'user', 'file')
         }),
         ('纹理参数', {
             'fields': ('texture_tags', 'composition'),
+            'classes': ('collapse',)
+        }),
+        ('时间信息', {
+            'fields': ('created_at', 'edited_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+@admin.register(DecorationModel)
+class DecorationModelAdmin(admin.ModelAdmin):
+    # 在列表页显示的字段
+    list_display = ('id','name', 'user', 'created_at')
+    
+    # 可搜索的字段
+    search_fields = ('name', 'user__username')
+    
+    # 右侧过滤器
+    list_filter = ('created_at', 'user')
+    
+    # 按创建时间降序排列
+    ordering = ('-created_at',)
+    
+    # 只读字段
+    readonly_fields = ('created_at', 'edited_at')
+    
+    # 每页显示数量  
+    list_per_page = 20
+    
+    # 字段分组显示
+    fieldsets = (
+        ('基本信息', {
+            'fields': ('name', 'user', 'file')
+        }),
+        ('装饰参数', {
+            'fields': ('decoration_tags',),
             'classes': ('collapse',)
         }),
         ('时间信息', {
