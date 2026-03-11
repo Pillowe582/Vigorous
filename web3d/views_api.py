@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-from .models import ProjectModel, PieceModel, TextureModel, PresetModel
+from .models import ProjectModel, PieceModel, TextureModel, PresetModel, DecorationModel
 from .serializers import (
     ProjectSerializer, 
     PieceSerializer, 
     TextureSerializer,
     PresetSerializer,
+    DecorationSerializer,
 )
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -74,7 +75,6 @@ class TextureViewSet(viewsets.ModelViewSet):
     serializer_class = TextureSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['source']
     search_fields = ['name']
     ordering_fields = ['created_at', 'edited_at', 'name']
     ordering = ['-created_at']
@@ -90,6 +90,29 @@ class TextureViewSet(viewsets.ModelViewSet):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class DecorationViewSet(viewsets.ModelViewSet):
+    """
+    装饰管理视图集
+    支持装饰上传、查询、更新等操作
+    """
+    serializer_class = DecorationSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['created_at', 'edited_at', 'name']
+    ordering = ['-created_at']
+    def get_queryset(self):
+        return DecorationModel.objects.filter(user=self.request.user)
+    @action(detail=False, methods=['post'])
+    def upload(self, request):
+        """专门的纹理上传接口"""
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class PresetViewSet(viewsets.ModelViewSet):
     """

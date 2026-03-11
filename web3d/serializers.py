@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import ProjectModel, PieceModel, TextureModel, PresetModel
+from .models import ProjectModel, PieceModel, TextureModel, PresetModel, DecorationModel
+
 
 class PresetSerializer(serializers.ModelSerializer):
     """预设棋子详情序列化器"""
@@ -93,6 +94,18 @@ class TextureSerializer(serializers.ModelSerializer):
     """纹理序列化器"""
     class Meta:
         model = TextureModel
+        fields = '__all__'
+        read_only_fields = ('user', 'created_at', 'edited_at')
+    
+    def create(self, validated_data):
+        # 自动设置当前用户
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+    
+class DecorationSerializer(serializers.ModelSerializer):
+    """装饰序列化器"""
+    class Meta:
+        model = DecorationModel
         fields = '__all__'
         read_only_fields = ('user', 'created_at', 'edited_at')
     
