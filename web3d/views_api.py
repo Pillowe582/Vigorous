@@ -23,7 +23,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     项目管理视图集
-    提供项目创建、查询、更新、删除等完整API
+    提供项目创建、查询、更新、删除等完整 API
     """
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
@@ -39,7 +39,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
             user=self.request.user
         ).select_related('user')
 
-    
+    @action(detail=False, methods=['get'])
+    def all_tags(self, request):
+        """
+        获取当前用户所有项目的所有唯一标签
+        """
+        # 获取当前用户的所有项目
+        projects = ProjectModel.objects.filter(user=request.user).only('project_tags')
+        
+        # 收集所有标签
+        all_tags = set()
+        for project in projects:
+            if project.project_tags:
+                all_tags.update(project.project_tags)
+        
+        # 转换为排序后的列表返回
+        return Response(sorted(list(all_tags)))
 
 class PieceViewSet(viewsets.ModelViewSet):
     """
