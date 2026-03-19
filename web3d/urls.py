@@ -19,7 +19,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('menu/',views.menu, name='menu'),
     path("api/getuser/", views.get_current_user, name="getuser"),
-    
+    path("api/llm/",views.fetchLLM, name="llm"),
     
     
     # REST API路由

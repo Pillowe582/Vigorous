@@ -144,6 +144,11 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = '/login/'  # 未登录用户重定向到登录页面
 LOGIN_REDIRECT_URL = '/web3d/menu/'  # 登录成功后跳转到编辑器页面
 
+# LLM API Config
+API_KEY=config('API_KEY')
+API_URL=config('API_URL')
+API_MODEL=config('API_MODEL')
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
