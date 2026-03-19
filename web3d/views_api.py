@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-from .models import ProjectModel, PieceModel, TextureModel, PresetModel
+from .models import ProjectModel, PieceModel, TextureModel, PresetModel, TemplateModel
 from .serializers import (
     ProjectSerializer, 
     PieceSerializer, 
     TextureSerializer,
     PresetSerializer,
+    TemplateSerializer,
 )
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -116,5 +117,31 @@ class PresetViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return PresetModel.objects.filter(user=self.request.user)
+
+class TemplateViewSet(viewsets.ModelViewSet):
+    """
+    模板棋子管理视图集
+    支持项目筛选和详细信息查询
+    """
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['project', 'type']
+    search_fields = ['name', 'description']
+    ordering_fields = ['created_at', 'edited_at', 'name']
+    ordering = ['-edited_at']
+    def get_serializer_class(self):
+        """
+        动态选择序列化器：
+        1. 访问列表(list)时，使用简略版。
+        2. 访问详情(retrieve)或创建(create)等时，使用完整版。
+        """
+        if self.action == 'list':
+            from .serializers import TemplateListSerializer
+            return TemplateListSerializer
+        return TemplateSerializer
+
+    def get_queryset(self):
+        queryset = TemplateModel.objects.filter(user=self.request.user)
+        return queryset.select_related('project')
 
     

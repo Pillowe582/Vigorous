@@ -11,6 +11,7 @@ router.register(r'api/projects', views_api.ProjectViewSet, basename='project')
 router.register(r'api/pieces', views_api.PieceViewSet, basename='piece')
 router.register(r'api/textures', views_api.TextureViewSet, basename='texture')
 router.register(r'api/presets', views_api.PresetViewSet, basename='preset')
+router.register(r'api/templates', views_api.TemplateViewSet, basename='template')
 
 urlpatterns = [
     # 传统页面路由

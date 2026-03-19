@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProjectModel, PieceModel, TextureModel, PresetModel
+from .models import ProjectModel, PieceModel, TextureModel, PresetModel, TemplateModel
 
 class PresetSerializer(serializers.ModelSerializer):
     """预设棋子详情序列化器"""
@@ -70,7 +70,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = ProjectModel
         fields = [
             'id', 'name', 'description',  'feature',
-            'project_tags', 'status', 'pieces_count', 
+            'project_tags', 'status', 'pieces_count', 'templates_count',
             'user', 'created_at', 'edited_at'
         ]
         extra_kwargs = {
@@ -88,6 +88,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_pieces_count(self, obj):
         # obj 是当前的 ProjectModel 实例
         return obj.piecemodel_set.count()
+    
+    def get_templates_count(self, obj):
+        # obj 是当前的 ProjectModel 实例
+        return obj.templatemodel_set.count()
 
 class TextureSerializer(serializers.ModelSerializer):
     """纹理序列化器"""
@@ -95,6 +99,40 @@ class TextureSerializer(serializers.ModelSerializer):
         model = TextureModel
         fields = '__all__'
         read_only_fields = ('user', 'created_at', 'edited_at')
+    
+    def create(self, validated_data):
+        # 自动设置当前用户
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+class TemplateListSerializer(serializers.ModelSerializer):
+    """模板列表序列化器"""
+    class Meta:
+        model = TemplateModel
+        fields = [
+            'id', 'name', 'description','piece_tags', 'type', 'created_at', 'edited_at'
+        ]
+        read_only_fields = ('user', 'created_at', 'edited_at')
+
+class TemplateSerializer(serializers.ModelSerializer):
+    """模板详情序列化器"""
+    
+    class Meta:
+        model = TemplateModel
+        fields = '__all__'
+        read_only_fields = ( 'created_at', 'edited_at')
+        extra_kwargs={
+            'user': {'read_only': True},
+            'piece_tags': {'required': False},
+        }
+    def validate_project(self, value):
+        """
+        校验：确保该项目属于当前登录用户
+        """
+        user = self.context['request'].user
+        if value.user != user:
+            raise serializers.ValidationError("你没有权限在别人的项目下创建模板！")
+        return value
     
     def create(self, validated_data):
         # 自动设置当前用户

@@ -78,6 +78,18 @@ class PieceModel(PieceAbstract):
         verbose_name = '项目下的棋子'
         verbose_name_plural = '项目下的棋子'
         
+class TemplateModel(PieceAbstract):
+    '''模板棋子模型'''
+    project = models.ForeignKey(ProjectModel, on_delete=models.CASCADE, verbose_name="所属项目")
+    
+    def __str__(self):
+        return f"{self.user.username}的项目{self.project.name}下的模板：{self.name}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = '模板棋子'
+        verbose_name_plural = '模板棋子'
+        
 class TextureModel(BasicInfoModel):
     """纹理模型"""
     file=models.ImageField(upload_to='textures/', verbose_name="纹理图片")
