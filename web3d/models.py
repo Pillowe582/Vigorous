@@ -83,7 +83,7 @@ class TemplateModel(PieceAbstract):
     project = models.ForeignKey(ProjectModel, on_delete=models.CASCADE, verbose_name="所属项目")
     
     def __str__(self):
-        return f"{self.user.username}的项目{self.project.name}下的模板：{self.name}"
+        return f"{self.user.username}的模板：{self.name}"
     
     class Meta:
         ordering = ['-created_at']
