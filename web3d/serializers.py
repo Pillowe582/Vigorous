@@ -63,6 +63,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     """项目序列化器"""
     # 显示该项目下的棋子数量
     pieces_count = serializers.SerializerMethodField()  #一个自定义字段
+    templates_count = serializers.SerializerMethodField()  # 模板数量字段
     
     # 以后若有需要（比如团队模式），可把这个加上
     # username = serializers.ReadOnlyField(source='user.username')
