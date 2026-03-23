@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
+import os
+from datetime import datetime
 
 # Create your models here.
 # web3d/models.py
@@ -77,13 +80,25 @@ class PieceModel(PieceAbstract):
         ordering = ['-created_at']
         verbose_name = '项目下的棋子'
         verbose_name_plural = '项目下的棋子'
-        
+
+def file_upload_path(instance, filename):
+    """
+    自定义纹理图片上传路径
+    文件名格式：用户名_时间戳.扩展名
+    """
+    # 获取文件扩展名
+    ext = os.path.splitext(filename)[1][1:]  # 去掉点号
+    # 生成时间戳
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    # 构建文件名：用户名_时间戳。扩展名
+    new_filename = f"{instance.user.username}/{ext}/{instance.user.username}_{timestamp}.{ext}"
+    # 返回完整路径：userassets/用户名_时间戳.扩展名
+    return os.path.join("userassets", new_filename)
+
 class TextureModel(BasicInfoModel):
     """纹理模型"""
-    file=models.ImageField(upload_to='textures/', verbose_name="纹理图片")
+    file=models.ImageField(upload_to=file_upload_path, verbose_name="纹理图片",validators=[FileExtensionValidator(['png','jpg','jpeg','webp'])])
     texture_tags=models.JSONField(default=list, blank=True, verbose_name="纹理标签")
-    source=models.CharField(max_length=200,choices=[('upload','上传'),('composite','合成')], blank=True, verbose_name="纹理来源")
-    composition=models.JSONField(default=dict, blank=True, verbose_name="纹理合成格式")
     def __str__(self):
         return f"{self.user.username}的纹理：{self.name}"
     class Meta:
@@ -91,3 +106,13 @@ class TextureModel(BasicInfoModel):
         verbose_name = '纹理'
         verbose_name_plural = '纹理'
         
+class DecorationModel(BasicInfoModel):
+    """装饰模型"""
+    file=models.FileField(upload_to=file_upload_path, verbose_name="装饰文件",validators=[FileExtensionValidator(['stl','obj'])])
+    decoration_tags=models.JSONField(default=list, blank=True, verbose_name="装饰标签")
+    def __str__(self):
+        return f"{self.user.username}的装饰：{self.name}"
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = '装饰'
+        verbose_name_plural = '装饰'

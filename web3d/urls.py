@@ -11,6 +11,7 @@ router.register(r'api/projects', views_api.ProjectViewSet, basename='project')
 router.register(r'api/pieces', views_api.PieceViewSet, basename='piece')
 router.register(r'api/textures', views_api.TextureViewSet, basename='texture')
 router.register(r'api/presets', views_api.PresetViewSet, basename='preset')
+router.register(r'api/decorations', views_api.DecorationViewSet, basename='decoration')
 
 urlpatterns = [
     # 传统页面路由
@@ -18,7 +19,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('menu/',views.menu, name='menu'),
     path("api/getuser/", views.get_current_user, name="getuser"),
-    
+    path("api/llm/",views.fetchLLM, name="llm"),
     
     
     # REST API路由
