@@ -165,3 +165,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # WhiteNoise 配置，用于生产环境静态文件服务
 WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Django REST Framework 配置
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}

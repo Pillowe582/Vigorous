@@ -97,6 +97,31 @@ class TextureViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return TextureModel.objects.filter(user=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        """
+        重写 update 方法，支持 multipart/form-data 的 PATCH 请求
+        """
+        partial = kwargs.get('partial', True)
+        instance = self.get_object()
+        
+        # 如果是 multipart/form-data，需要特殊处理
+        if request.content_type.startswith('multipart/form-data'):
+            # 合并 request.data 和 request.FILES
+            from django.http import QueryDict
+            data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+            
+            # 将文件添加到数据中
+            for key, file in request.FILES.items():
+                data[key] = file
+            
+            serializer = self.get_serializer(instance, data=data, partial=partial)
+        else:
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['post'])
     def upload(self, request):
         """专门的纹理上传接口"""

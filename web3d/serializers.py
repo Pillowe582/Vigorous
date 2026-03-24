@@ -96,11 +96,25 @@ class TextureSerializer(serializers.ModelSerializer):
         model = TextureModel
         fields = '__all__'
         read_only_fields = ('user', 'created_at', 'edited_at')
+        extra_kwargs = {
+            'file': {'required': False},  # 更新时文件可选
+            'texture_tags': {'required': False}
+        }
     
     def create(self, validated_data):
         # 自动设置当前用户
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """
+        更新纹理：只有当提供了 file 字段时才更新文件
+        """
+        # 只更新提供的字段
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
     
 class DecorationSerializer(serializers.ModelSerializer):
     """装饰序列化器"""
