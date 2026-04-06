@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
@@ -21,16 +22,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     # 认证相关路径必须在主应用之前注册
-    path('', include('accounts.urls')),
-    path('', include('web3d.urls')),
-    
+    path("", include("accounts.urls")),
+    path("", include("web3d.urls")),
     # React 页面入口
-    re_path(r'^menu/?$', TemplateView.as_view(template_name="index.html")),
-    re_path(r'^explorer-.*$', TemplateView.as_view(template_name="index.html")),
-    re_path(r'^project-editor/.*$', TemplateView.as_view(template_name="index.html")),
-    re_path(r'^chess-editor/.*$', TemplateView.as_view(template_name="index.html")),
+    re_path(r"^menu/?$", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^explorer-.*$", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^project-editor/.*$", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^chess-editor/.*$", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^template-editor/.*$", TemplateView.as_view(template_name="index.html")),
     # re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
 ]
 

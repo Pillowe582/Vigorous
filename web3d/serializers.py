@@ -58,6 +58,7 @@ class PieceListSerializer(serializers.ModelSerializer):
             "description",
             "piece_tags",
             "type",
+            "user",
             "created_at",
             "edited_at",
         ]
