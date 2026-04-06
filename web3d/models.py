@@ -77,6 +77,12 @@ class PieceAbstract(BasicInfoModel):
 class PresetModel(PieceAbstract):
     """预设棋子模型"""
 
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name="所有已登录用户可见",
+        help_text="勾选后，所有已登录用户都可以查看此预设棋子。",
+    )
+
     def __str__(self):
         return f"{self.user.username}的预设棋子：{self.name}"
 

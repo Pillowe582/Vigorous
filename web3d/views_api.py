@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db.models import Q
 
 from .models import (
     ProjectModel,
@@ -28,6 +29,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         return obj.user == request.user
 
 
@@ -209,7 +212,22 @@ class PresetViewSet(viewsets.ModelViewSet):
         return PresetSerializer
 
     def get_queryset(self):
-        return PresetModel.objects.filter(user=self.request.user)
+        return PresetModel.objects.filter(Q(user=self.request.user) | Q(is_public=True))
+
+    def perform_create(self, serializer):
+        # 仅管理员可通过 API 创建公开预设，普通用户提交时强制为私有。
+        is_public = serializer.validated_data.get("is_public", False)
+        if is_public and not self.request.user.is_staff:
+            serializer.save(user=self.request.user, is_public=False)
+            return
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        # 仅管理员可通过 API 修改公开状态。
+        if "is_public" in serializer.validated_data and not self.request.user.is_staff:
+            serializer.save(is_public=serializer.instance.is_public)
+            return
+        serializer.save()
 
 
 class TemplateViewSet(viewsets.ModelViewSet):

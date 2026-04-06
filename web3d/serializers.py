@@ -18,6 +18,7 @@ class PresetSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_at", "edited_at")
         extra_kwargs = {
             "user": {"read_only": True},
+            "is_public": {"read_only": True},
             "piece_tags": {"required": False},
         }
 
@@ -34,10 +35,12 @@ class PresetListSerializer(serializers.ModelSerializer):
         model = PresetModel
         fields = [
             "id",
+            "user",
             "name",
             "description",
             "piece_tags",
             "type",
+            "is_public",
             "created_at",
             "edited_at",
         ]
