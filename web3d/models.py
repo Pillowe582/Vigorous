@@ -144,7 +144,7 @@ def file_upload_path(instance, filename):
 class TextureModel(BasicInfoModel):
     """纹理模型"""
 
-    file = models.ImageField(
+    file = models.FileField(
         upload_to=file_upload_path,
         verbose_name="纹理图片",
         validators=[FileExtensionValidator(["png", "jpg", "jpeg", "webp"])],
