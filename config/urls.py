@@ -35,6 +35,5 @@ urlpatterns = [
     # re_path(r'^.*$', TemplateView.as_view(template_name='index.html')), # 添加保底路由
 ]
 
-# 开发环境下提供媒体文件服务
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# 在当前部署模式下提供媒体文件服务（最小改动方案）
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
