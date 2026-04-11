@@ -262,6 +262,12 @@ class PresetViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "edited_at", "name"]
     ordering = ["-edited_at"]
 
+    def get_permissions(self):
+        # apply_to_projects 使用动作内部的权限校验，避免被 IsOwnerOrReadOnly 在对象层提前拦截。
+        if self.action == "apply_to_projects":
+            return [permissions.IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
     def get_serializer_class(self):
         """
         动态选择序列化器：
