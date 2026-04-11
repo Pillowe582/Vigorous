@@ -87,9 +87,17 @@
         </div>
 
         <div class="links">
-            
+            <p>
+                <a href="#" id="quick-test-login">使用公用测试账号体验</a>
+            </p>
             <p style="margin-top: 10px;"><a href="{% url 'web3d:home' %}">返回首页</a></p>
         </div>
+
+        <form id="quick-test-login-form" method="post" action="{% url 'accounts:login' %}" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="username" value="Test">
+            <input type="hidden" name="password" value="Whatcanisay">
+        </form>
     </div>
 
     <script>
@@ -133,6 +141,16 @@
             const firstErrorField = document.querySelector('.error-field input');
             if (firstErrorField) {
                 firstErrorField.focus();
+            }
+
+            const quickTestLogin = document.getElementById('quick-test-login');
+            const quickTestLoginForm = document.getElementById('quick-test-login-form');
+
+            if (quickTestLogin && quickTestLoginForm) {
+                quickTestLogin.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    quickTestLoginForm.submit();
+                });
             }
         });
     </script>

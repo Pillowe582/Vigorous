@@ -67,6 +67,9 @@
         <div class="links">
             <p>还没有账户？ <a href="{% url 'accounts:register' %}">立即注册</a></p>
             <p style="margin-top: 10px;"><a href="{% url 'web3d:home' %}">返回首页</a></p>
+            <p style="margin-top: 16px;">
+                <a href="#" id="quick-test-login" style="color: #047700;">使用公用测试账号体验</a>
+            </p>
         </div>
     </div>
 
@@ -80,6 +83,25 @@
                 firstErrorField.focus();
             } else if (usernameField) {
                 usernameField.focus();
+            }
+
+            const quickTestLogin = document.getElementById('quick-test-login');
+            if (quickTestLogin) {
+                quickTestLogin.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    const form = document.querySelector('form[method="post"]');
+                    const usernameInput = document.querySelector('input[name="username"]');
+                    const passwordInput = document.querySelector('input[name="password"]');
+
+                    if (!form || !usernameInput || !passwordInput) {
+                        return;
+                    }
+
+                    usernameInput.value = 'Test';
+                    passwordInput.value = 'Whatcanisay';
+                    form.submit();
+                });
             }
         });
     </script>
