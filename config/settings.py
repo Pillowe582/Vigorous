@@ -30,6 +30,16 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 TRUSTED_PROXIES = config('TRUSTED_PROXIES', default='127.0.0.1').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in config('CSRF_TRUSTED_ORIGINS', default='').split(',')
+    if o.strip()
+]
+
+if config('TRUST_FORWARDED_PROTO', default=False, cast=bool):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
+
 # Application definition
 
 INSTALLED_APPS = [
